@@ -1,0 +1,10 @@
+@use '@cloudscape-design/design-tokens/index.scss' as awsui;
+
+.home_header {
+  color: awsui.$color-text-home-header-default !important;
+  background-color: awsui.$color-background-home-header;
+}
+
+.home_header_secondary {
+  color: awsui.$color-text-home-header-secondary !important;
+}

@@ -1,0 +1,7 @@
+{
+    "AppSyncApiName": "awsui",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "S3DeploymentBucket": "amplify-awsui-dev-65008-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/cbfe04da28f1cf07b8e04364a67dc46e303b489d"
+}
