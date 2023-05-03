@@ -12,6 +12,7 @@ import Home from './Pages/Home';
 import Stock from './Pages/Stock';
 import WatchlistDetail from './components/WatchlistDetail';
 import News from './Pages/News';
+import '@aws-amplify/ui-react/styles.css';
 
 I18n.putVocabularies(translations);
 I18n.setLanguage('en');
