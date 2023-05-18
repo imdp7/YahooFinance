@@ -10,7 +10,7 @@ import {
   Link,
   Badge,
 } from '@cloudscape-design/components';
-const key = '2e483bfda5mshdb59dafdf59818fp1f6fb5jsndce66f23746a';
+const key = 'f53dc66b50msh0675c5b70ce3b02p14aa61jsn41c6f5243910';
 const BASE_URL =
   'https://apidojo-yahoo-finance-v1.p.rapidapi.com/news/list?category=';
 const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
