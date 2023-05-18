@@ -29,7 +29,7 @@ export function AppFooter(): JSX.Element {
         </div>
         <div id="right">
           <span id="text">
-            © 2023, Amazon Web Services, Inc. or its affiliates.
+            © 2023, Yahoo Finance, Inc. or its affiliates.
           </span>
           <span id="links">
             <Link href="#" id="link" fontSize="body-s">

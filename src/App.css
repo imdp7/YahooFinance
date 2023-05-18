@@ -223,3 +223,50 @@
   margin-right: auto;
   margin-left: auto;
 } */
+
+.hero {
+  background-image: url('https://s.aolcdn.com/membership/omp-static/biblio/plus/hero-yangle/img/finance/hero-1-large@2x.jpg');
+  height: 100vh;
+  background-size: auto;
+  padding: 0%;
+  margin: 1% 0%;
+  color: white;
+}
+.hero-header {
+  padding: 2rem 3rem;
+  max-width: 620px;
+  flex-wrap: wrap;
+  font-size: 2.5rem;
+}
+.hero-des {
+  padding: 2px 3rem;
+  max-width: 620px;
+  flex-wrap: wrap;
+  font-size: large;
+}
+.hero-btn {
+  padding: 2px 3rem;
+  max-width: 720px;
+  flex-wrap: wrap;
+}
+.hero-closure {
+  padding: 2px 3rem;
+  max-width: 520px;
+  flex-wrap: wrap;
+  font-size: small;
+}
+.faqs {
+  /* background-color: #38007D; */
+  height: full;
+  width: full;
+  color: white;
+  padding: 10px;
+  margin: 10px;
+  text-align: center;
+}
+
+.summary-panel {
+  position: sticky;
+  height: 30%;
+  width: 100%;
+}

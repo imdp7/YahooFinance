@@ -13,6 +13,8 @@ import Stock from './Pages/Stock';
 import WatchlistDetail from './components/WatchlistDetail';
 import News from './Pages/News';
 import '@aws-amplify/ui-react/styles.css';
+import Payment from './components/common/Payment';
+import Account from './Auth/Components/Account';
 
 I18n.putVocabularies(translations);
 I18n.setLanguage('en');
@@ -34,6 +36,14 @@ const App = ({ user, signOut }) => {
           <Route
             path="/home"
             element={<HomePage user={user.username} signOut={signOut} />}
+          />
+          <Route
+            path="/checkout"
+            element={<Payment user={user.username} signOut={signOut} />}
+          />
+          <Route
+            path="/account"
+            element={<Account user={user.username} signOut={signOut} />}
           />
           <Route
             path="/"

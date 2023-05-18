@@ -1,11 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
-import { AppHeader } from './features/common/TopNavigations';
-import './App.css';
-import classes from './app.module.scss';
-import ec2 from '../assets/ec2/Res_Amazon-EC2_A1-Instance_48_Dark.png';
-import s3 from '../assets/s3/Res_Amazon-Simple-Storage-Service_Bucket_48_Dark.png';
-import rds from '../assets/rds/Res_Amazon-Aurora_Amazon-RDS-Instance_48_Dark.png';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Outlet } from "react-router-dom";
+import "./App.css";
 import {
   Box,
   ColumnLayout,
@@ -19,103 +14,19 @@ import {
   Grid,
   Button,
   Spinner,
-  Modal,
+  Icon,
   ButtonDropdown,
-} from '@cloudscape-design/components';
-import { Board, BoardItem } from '@cloudscape-design/board-components';
-import { useOutletContext } from 'react-router';
-import { InfoLink, ValueWithLabel } from './features/common/common';
-import { appLayoutLabels } from './features/common/labels';
-import { AppFooter } from './features/common/AppFooter';
-import Card from './components/Trending';
-
-const arrayData = [
-  ['EC2 Instance', `${ec2}`, 'ec2_instance/home'],
-  ['S3', `${s3}`, 's3/home'],
-  ['CloudWatch', `${s3}`, 'cloudwatch/home'],
-  ['Amazon RDS', `${rds}`, 'rds'],
-  ['Cloudfront', `${ec2}`, 'cloudfront'],
-  ['SQS', `${ec2}`, 'sqs'],
-  ['Amazon Connect', `${ec2}`, 'connect'],
-  ['VPC', `${ec2}`, 'vpc'],
-  ['IAM', `${ec2}`, 'iam'],
-  ['Rekognition', `${ec2}`, 'rekognition'],
-  ['Cloudshell', `${ec2}`, 'cloudshell'],
-  ['Amazon Kendra', `${ec2}`, 'kendra'],
-  ['Route 53', `${ec2}`, 'route53'],
-  ['API Gateway', `${ec2}`, 'apigateway'],
-  ['AWS Amplify', `${ec2}`, 'awsamplify'],
-  ['CodeStar', `${ec2}`, 'codestar'],
-  ['AWS MGN', `${s3}`, 'awsmgn'],
-];
-
-const HomeHeader = ({ loadHelpPanelContent }): JSX.Element => {
-  const updateTools = useOutletContext<(element: JSX.Element) => void>();
-  const [visible, setVisible] = useState(false);
-
-  const onDismissHandler = () => {
-    setVisible(false);
-  };
-  const onSubmit = () => {
-    setVisible(false);
-  };
-
-  return (
-    <SpaceBetween size="s">
-      <Box
-        margin={{ bottom: 's' }}
-        padding={{ horizontal: 'xxl', vertical: 'm' }}
-        className={classes.home_header}
-      >
-        <Modal
-          onDismiss={onDismissHandler}
-          visible={visible}
-          closeAriaLabel="Close modal"
-          size="large"
-          footer={
-            <Box float="right">
-              <SpaceBetween direction="horizontal" size="xs">
-                <Button variant="link" onClick={onDismissHandler}>
-                  Cancel
-                </Button>
-                <Button variant="primary" onClick={onSubmit}>
-                  Ok
-                </Button>
-              </SpaceBetween>
-            </Box>
-          }
-          header="Add Widgets"
-        >
-          <Card />
-        </Modal>
-        <Header
-          variant="h1"
-          actions={
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button>Reset to default layout</Button>
-              <Button
-                ariaLabel="AddWidget"
-                variant="primary"
-                iconName="add-plus"
-                loadingText="loading"
-                onClick={() => setVisible(true)}
-              >
-                Add Widgets
-              </Button>
-            </SpaceBetween>
-          }
-          info={<InfoLink />}
-        >
-          Console Home
-        </Header>
-      </Box>
-    </SpaceBetween>
-  );
-};
-
-function strReduce(string = '') {
-  return string.substring(0, length);
-}
+  ContentLayout,
+  ExpandableSection,
+} from "@cloudscape-design/components";
+import { useOutletContext } from "react-router";
+import { InfoLink, ValueWithLabel } from "./features/common/common";
+import { appLayoutLabels } from "./features/common/labels";
+import { AppFooter } from "./features/common/AppFooter";
+import CommonHeader from "./components/common/CommonHeader";
+import Package from "./components/common/Package";
+import Analysis from "./components/common/Analysis";
+import Subscriber from "./components/common/Subscriber";
 
 const HomeFeatures = ({ loadHelpPanelContent }): JSX.Element => {
   const [visible, setVisible] = useState(true);
@@ -129,529 +40,351 @@ const HomeFeatures = ({ loadHelpPanelContent }): JSX.Element => {
     event.preventDefault();
   };
   const updateTools = useOutletContext<(element: JSX.Element) => void>();
-
-  const RecentlyVisited = () => {
-    return (
-      <>
-        <ColumnLayout columns={4} borders="horizontal">
-          {arrayData.map((d) => (
-            <div
-              key={d[0]}
-              style={{
-                display: 'flex',
-                justifyItems: 'center',
-                textAlign: 'center',
-                fontSize: '10px',
-              }}
-            >
-              <img src={`${d[1]}`} alt="logo" height="35" width="35" />
-              <Box variant="div" padding={{ top: 'n', left: 'xs' }}>
-                <Link
-                  variant="secondary"
-                  href={`${d[2]}`}
-                  onFollow={defaultOnFollowHandler}
-                >
-                  {d[0]}
-                </Link>{' '}
-              </Box>
-            </div>
-          ))}
-        </ColumnLayout>
-      </>
-    );
-  };
-
-  const Health = () => {
-    return (
-      <>
-        <ColumnLayout>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Open Issues
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              7 days ago
-            </Box>
-          </Grid>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Scheduled changes
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              7 days ago
-            </Box>
-          </Grid>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Other notifications
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              7 days ago
-            </Box>
-          </Grid>
-        </ColumnLayout>
-      </>
-    );
-  };
-
-  const CostUsage = () => {
-    return (
-      <>
-        <SpaceBetween size="s">
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Open Issues
-          </Box>
-          <ColumnLayout columns={4}>
-            {arrayData.map((d) => (
-              <div
-                key={d[0]}
-                style={{
-                  display: 'flex',
-                  justifyItems: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                <img src={`${d[1]}`} alt="logo" height="35" width="35" />
-                <Box variant="div" padding={{ top: 'n', left: 'xs' }}>
-                  <Link
-                    variant="secondary"
-                    href={`${d[2]}`}
-                    onFollow={defaultOnFollowHandler}
-                  >
-                    {d[0]}
-                  </Link>{' '}
-                </Box>
-              </div>
-            ))}
-          </ColumnLayout>
-        </SpaceBetween>
-      </>
-    );
-  };
-
-  const BuildSolution = () => {
-    return (
-      <>
-        <SpaceBetween size="s">
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Open Issues
-          </Box>
-          <ColumnLayout columns={4} variant="text-grid">
-            {arrayData.map((d) => (
-              <div
-                key={d[0]}
-                style={{
-                  display: 'flex',
-                  justifyItems: 'center',
-                  textAlign: 'center',
-                }}
-              >
-                <img src={`${d[1]}`} alt="logo" height="35" width="35" />
-                <Box variant="div" padding={{ top: 'n', left: 'xs' }}>
-                  <Link
-                    variant="secondary"
-                    href={`${d[2]}`}
-                    onFollow={defaultOnFollowHandler}
-                  >
-                    {d[0]}
-                  </Link>{' '}
-                </Box>
-              </div>
-            ))}
-          </ColumnLayout>
-        </SpaceBetween>
-      </>
-    );
-  };
-
-  const TrustedAdviser = () => {
-    return (
-      <>
-        <ColumnLayout>
-          <Box variant="awsui-key-label" color="text-status-error">
-            Action recommended
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-error" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              <Link href="#" variant="primary">
-                Details
-              </Link>
-            </Box>
-          </Grid>
-          <Box variant="awsui-key-label" color="text-status-info">
-            Investigation recommended
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              <Link href="#" variant="primary">
-                Details
-              </Link>
-            </Box>
-          </Grid>
-          <Box variant="awsui-key-label" color="text-status-success">
-            Other notifications
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-success" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              <Link href="#" variant="primary">
-                Details
-              </Link>
-            </Box>
-          </Grid>
-        </ColumnLayout>
-      </>
-    );
-  };
-
-  const ExlporeAWS = () => {
-    return (
-      <>
-        <SpaceBetween size="m">
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            <Link external fontSize="heading-s">
-              {' '}
-              AWS Certifications
-            </Link>
-            <Box>Propel your career forward with AWS Certification.</Box>
-          </Box>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            <Link external fontSize="heading-s">
-              {' '}
-              Free AWS Training
-            </Link>
-            <Box>
-              Advance your career with AWS Cloud Practitioner Essentials—a free,
-              six-hour, foundational course.
-            </Box>
-          </Box>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            <Link external fontSize="heading-s">
-              AWS Training
-            </Link>
-            <Box>Free digital courses to help you develop your skills.</Box>
-          </Box>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            <Link external fontSize="heading-s">
-              Free AWS Digital Training
-            </Link>
-            <Box>
-              Learn the AWS Cloud today to create opportunities tomorrow: find
-              out how.
-            </Box>
-          </Box>
-        </SpaceBetween>
-      </>
-    );
-  };
-
-  const LatestAnnouncement = () => {
-    return (
-      <>
-        <Container
-          header={
-            <Header
-              variant="h2"
-              info={
-                <InfoLink
-                  onFollow={() =>
-                    loadHelpPanelContent(
-                      <HelpPanels
-                        title="Latest announcements"
-                        des="View the latest announcement for the AWS services you're using. Learn about new capabilities that you can use to experiment and innovate. These announcements are personalized to your account."
-                      />
-                    )
-                  }
-                />
-              }
-            >
-              Latest Announcements
-            </Header>
-          }
-          footer={
-            <Box
-              variant="h5"
-              tagOverride="h5"
-              //padding={{ bottom: 's', top: 'l' }}
-              textAlign="center"
-            >
-              <Link href="/console/services">View all Announcements</Link>
-            </Box>
-          }
-        >
-          <Box color="text-status-info" variant="h2">
-            <Link>
-              {strReduce(
-                'Amazon AppFlow now supports Microsoft SharePoint Online as a source'
-              )}
-            </Link>
-            <Link>
-              {strReduce(
-                'Amazon AppFlow now supports Microsoft SharePoint Online as a source'
-              )}
-            </Link>
-          </Box>
-        </Container>
-      </>
-    );
-  };
-
-  const AWSBlogs = () => {
-    return (
-      <>
-        <ColumnLayout>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Open Issues
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              7 days ago
-            </Box>
-          </Grid>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Scheduled changes
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              7 days ago
-            </Box>
-          </Grid>
-          <Box variant="awsui-key-label" color="text-status-inactive">
-            Other notifications
-          </Box>
-          <Grid gridDefinition={[{ colspan: 4 }, { colspan: 8 }]}>
-            <Box color="text-status-info" variant="h1" textAlign="center">
-              0
-            </Box>
-            <Box float="right" textAlign="center">
-              7 days ago
-            </Box>
-          </Grid>
-        </ColumnLayout>
-      </>
-    );
-  };
-  const [items, setItems] = useState([
+  const items1 = [
     {
-      id: '1',
-      rowSpan: 4,
-      columnSpan: 3,
-      data: {
-        title: 'Recently Visited',
-        footer: (
-          <Box textAlign="center">
-            <Link href="/console/services">View all AWS services</Link>
-          </Box>
-        ),
-        content: <RecentlyVisited />,
-      },
+      text: "Research reports from Morningstar & Argus§",
+      key: "0",
+      color: true,
+      description:
+        "Access professional reports with quality independent research.",
     },
     {
-      id: '2',
-      rowSpan: 4,
-      columnSpan: 1,
-      data: { title: 'AWS Blogs', content: <AWSBlogs /> },
+      text: "Enhanced charting with auto pattern recognition",
+      key: "1",
+      color: true,
+      description:
+        "Instantly identify chart patterns through automated pattern recognition.",
     },
     {
-      id: '3',
-      rowSpan: 4,
-      columnSpan: 1,
-      data: { title: 'AWS Health', content: <Health /> },
+      text: "Historical financials & statistics with CSV export",
+      key: "2",
+      color: true,
+      description:
+        "Use reliable and transparent fundamental data to help make informed investment decisions.",
     },
     {
-      id: '4',
-      rowSpan: 4,
-      columnSpan: 2,
-      data: { title: 'Cost and Usage', content: <CostUsage /> },
+      text: "Unique company insights on leading indicators",
+      key: "3",
+      color: true,
+      description:
+        "Get a comprehensive overview of key alternative data sets with intuitive visualizations.",
     },
     {
-      id: '5',
-      rowSpan: 4,
-      columnSpan: 1,
-      data: { title: 'Trusted Advisor', content: <TrustedAdviser /> },
+      text: "Market Digest newsletter",
+      key: "4",
+      color: true,
+      description:
+        "Stay up-to-date with expert analysis on emerging market news and research, delivered to your inbox.",
     },
     {
-      id: '6',
-      rowSpan: 4,
-      columnSpan: 2,
-      data: { title: 'Build a Solution', content: <BuildSolution /> },
+      text: "Daily trade ideas based on your interests",
+      key: "5",
+      description:
+        "Discover new trade ideas that are trending or relevant to the companies you follow.",
     },
     {
-      id: '7',
-      rowSpan: 4,
-      columnSpan: 1,
-      data: { title: 'Explore AWS', content: <ExlporeAWS /> },
+      text: "Fair value analysis for stocks",
+      key: "6",
+      description:
+        "Learn whether a stock matches the Peter Lynch valuation in an intuitive interface.",
     },
     {
-      id: '8',
-      rowSpan: 4,
-      columnSpan: 1,
-      data: { title: 'AWS Blogs', content: <AWSBlogs /> },
+      text: "Advanced portfolio performance analysis tools",
+      key: "7",
+      description:
+        "Get premium tools to analyze allocation, diversification and risk.",
     },
-  ]);
+    {
+      text: "Yahoo Finance community insights",
+      key: "8",
+      description:
+        "See what tickers are trending on Yahoo Finance in terms of user visits, conversations and portfolio changes.",
+    },
+    {
+      text: "Enhanced alerts",
+      key: "9",
+      description:
+        "Get alerted whenever new research reports, analyst ratings, trade ideas, SEC filings and technical patterns are available for the companies you follow.",
+    },
+    {
+      text: "Live chat support on desktop",
+      key: "10",
+      description:
+        "Chat with a live agent about Finance-related questions/concerns 8 AM - 9 PM ET Monday through Friday.",
+    },
+    {
+      text: "Ad-free Yahoo†",
+      key: "11",
+      description: "Enjoy your favorite Yahoo sites and apps without the ads.",
+    },
+    {
+      text: "24/7 Account Support",
+      key: "12",
+      description:
+        "24/7 phone support for general Yahoo account support inquiries, including billing, account recovery and updating account information.",
+    },
+    {
+      text: "Buy More. Save More.✣",
+      key: "13",
+      description:
+        "Unlock extra savings when you buy more subscriptions. Get up to 20% off eligible Yahoo Plus products.",
+    },
+  ];
+  const items2 = [
+    {
+      text: "Daily trade ideas based on your interests",
+      key: "0",
+      description:
+        "Discover new trade ideas that are trending or relevant to the companies you follow.",
+    },
+    {
+      text: "Fair value analysis for stocks",
+      key: "1",
+      description:
+        "Learn whether a stock matches the Peter Lynch valuation in an intuitive interface.",
+    },
+    {
+      text: "Advanced portfolio performance analysis tools",
+      key: "2",
+      description:
+        "Get premium tools to analyze allocation, diversification and risk.",
+    },
+    {
+      text: "Yahoo Finance community insights",
+      key: "3",
+      description:
+        "See what tickers are trending on Yahoo Finance in terms of user visits, conversations and portfolio changes.",
+    },
+    {
+      text: "Enhanced alerts",
+      key: "4",
+      description:
+        "Get alerted whenever new research reports, analyst ratings, trade ideas, SEC filings and technical patterns are available for the companies you follow.",
+    },
+    {
+      text: "Live chat support on desktop",
+      key: "5",
+      description:
+        "Chat with a live agent about Finance-related questions/concerns 8 AM - 9 PM ET Monday through Friday.",
+    },
+    {
+      text: "Ad-free Yahoo†",
+      key: "6",
+      description: "Enjoy your favorite Yahoo sites and apps without the ads.",
+    },
+    {
+      text: "24/7 Account Support",
+      key: "7",
+      description:
+        "24/7 phone support for general Yahoo account support inquiries, including billing, account recovery and updating account information.",
+    },
+    {
+      text: "Buy More. Save More.✣",
+      key: "8",
+      description:
+        "Unlock extra savings when you buy more subscriptions. Get up to 20% off eligible Yahoo Plus products.",
+    },
+  ];
+
+  const opts = {
+    height: "390",
+    width: "640",
+    playerVars: {
+      // https://developers.google.com/youtube/player_parameters
+      autoplay: 1,
+    },
+  };
   return (
-    <>
-      <HomeHeader loadHelpPanelContent={loadHelpPanelContent} />
-      <SpaceBetween size="l">
-        <Alert
-          onDismiss={() => setVisible(false)}
-          visible={visible}
-          dismissAriaLabel="Close alert"
-          dismissible
-          header="Introducing the new widgets Applications."
-        >
-          {' '}
-        </Alert>
-
-        <Board
-          renderItem={(item, actions) => (
-            <BoardItem
-              header={<Header>{item.data.title}</Header>}
-              footer={item.data.footer}
-              i18nStrings={{
-                dragHandleAriaLabel: 'Drag handle',
-                dragHandleAriaDescription:
-                  'Use Space or Enter to activate drag, arrow keys to move, Space or Enter to submit, or Escape to discard.',
-                resizeHandleAriaLabel: 'Resize handle',
-                resizeHandleAriaDescription:
-                  'Use Space or Enter to activate resize, arrow keys to move, Space or Enter to submit, or Escape to discard.',
-              }}
-              settings={
-                <ButtonDropdown
-                  items={[{ id: 'remove', text: 'Remove' }]}
-                  ariaLabel="Board item settings"
-                  variant="icon"
-                  onItemClick={() => actions.removeItem()}
-                />
-              }
-            >
-              {item.data.content}
-            </BoardItem>
-          )}
-          onItemsChange={(event) => setItems(event.detail.items)}
-          items={items}
-          i18nStrings={(() => {
-            function createAnnouncement(
-              operationAnnouncement,
-              conflicts,
-              disturbed
-            ) {
-              const conflictsAnnouncement =
-                conflicts.length > 0
-                  ? `Conflicts with ${conflicts
-                      .map((c) => c.data.title)
-                      .join(', ')}.`
-                  : '';
-              const disturbedAnnouncement =
-                disturbed.length > 0
-                  ? `Disturbed ${disturbed.length} items.`
-                  : '';
-              return [
-                operationAnnouncement,
-                conflictsAnnouncement,
-                disturbedAnnouncement,
-              ]
-                .filter(Boolean)
-                .join(' ');
-            }
-            return {
-              liveAnnouncementDndStarted: (operationType) =>
-                operationType === 'resize' ? 'Resizing' : 'Dragging',
-              liveAnnouncementDndItemReordered: (operation) => {
-                const columns = `column ${operation.placement.x + 1}`;
-                const rows = `row ${operation.placement.y + 1}`;
-                return createAnnouncement(
-                  `Item moved to ${
-                    operation.direction === 'horizontal' ? columns : rows
-                  }.`,
-                  operation.conflicts,
-                  operation.disturbed
-                );
-              },
-              liveAnnouncementDndItemResized: (operation) => {
-                const columnsConstraint = operation.isMinimalColumnsReached
-                  ? ' (minimal)'
-                  : '';
-                const rowsConstraint = operation.isMinimalRowsReached
-                  ? ' (minimal)'
-                  : '';
-                const sizeAnnouncement =
-                  operation.direction === 'horizontal'
-                    ? `columns ${operation.placement.width}${columnsConstraint}`
-                    : `rows ${operation.placement.height}${rowsConstraint}`;
-                return createAnnouncement(
-                  `Item resized to ${sizeAnnouncement}.`,
-                  operation.conflicts,
-                  operation.disturbed
-                );
-              },
-              liveAnnouncementDndItemInserted: (operation) => {
-                const columns = `column ${operation.placement.x + 1}`;
-                const rows = `row ${operation.placement.y + 1}`;
-                return createAnnouncement(
-                  `Item inserted to ${columns}, ${rows}.`,
-                  operation.conflicts,
-                  operation.disturbed
-                );
-              },
-              liveAnnouncementDndCommitted: (operationType) =>
-                `${operationType} committed`,
-              liveAnnouncementDndDiscarded: (operationType) =>
-                `${operationType} discarded`,
-              liveAnnouncementItemRemoved: (op) =>
-                createAnnouncement(
-                  `Removed item ${op.item.data.title}.`,
-                  [],
-                  op.disturbed
-                ),
-              navigationAriaLabel: 'Board navigation',
-              navigationAriaDescription:
-                'Click on non-empty item to move focus over',
-              navigationItemAriaLabel: (item) =>
-                item ? item.data.title : 'Empty',
-            };
-          })()}
-          empty={
-            <Box textAlign="center" color="inherit">
-              <SpaceBetween size="xxs">
-                <div>
-                  <Box variant="strong" color="inherit">
-                    No items
-                  </Box>
-                  <Box variant="p" color="inherit">
-                    There are no items on the dashboard.
-                  </Box>
-                </div>
-                <Button iconName="add-plus">Add an item</Button>
-              </SpaceBetween>
+    <Grid
+      gridDefinition={[
+        { colspan: { l: 12, m: 12, default: 12 } },
+        { colspan: { l: 12, m: 12, default: 12 } },
+        { colspan: { l: 12, m: 12, default: 12 } },
+        { colspan: { l: 12, m: 12, default: 12 } },
+        { colspan: { l: 12, m: 12, default: 12 } },
+        { colspan: { l: 12, m: 12, default: 12 } },
+      ]}>
+      <div className="hero">
+        <div className="hero-content">
+          <h1 className="hero-header">Stay ahead of the market</h1>
+          <h5 className="hero-des">
+            Get advanced tools and insights to navigate the markets with Yahoo
+            Finance Plus.
+          </h5>
+          <div className="hero-btn">
+            <Button variant="primary" onClick={() => navigate('/checkout')}>
+              Try 14 days free <sup>*</sup>
+            </Button>
+          </div>
+          <p className="hero-closure">
+            * To avoid being charged the recurring subscription fee, cancel
+            before your free-trial period ends.
+          </p>
+        </div>
+      </div>
+      <div style={{ margin: "20px" }}>
+        <SpaceBetween size="l">
+          <Box fontSize="display-l" fontWeight="heavy" textAlign="center">
+            Yahoo Finance Plus Plans
+          </Box>
+          <Box fontSize="heading-m" fontWeight="normal" textAlign="center">
+            Choose the plan that suits you and get started today.
+          </Box>
+          <ColumnLayout columns={2}>
+            <Package
+              title="Essential"
+              price="$29.99 / month,"
+              variant="primary"
+              items={items1}
+            />
+            <Package title="Lite" price="$20.99 / month," items={items2} />
+          </ColumnLayout>
+          <SpaceBetween size="m">
+            <Box textAlign="center" fontSize="heading-s">
+              *To avoid being charged the recurring subscription fee, cancel
+              before the free-trial period ends.
             </Box>
-          }
-        />
-      </SpaceBetween>
-    </>
+            <Box textAlign="center" fontSize="heading-s">
+              § Premium data coverage is limited to US equities.
+            </Box>
+            <Box textAlign="center" fontSize="heading-s">
+              † Due to contractual obligations related to certain ad types, you
+              may encounter minimal ads from time to time on certain properties.
+            </Box>
+            <Box textAlign="center" fontSize="heading-s">
+              ‡ If your account was created through AT&T or Frontier, please
+              contact your applicable Internet Service Provider for
+              account-related support, including password resets and updating
+              account information. View our help article for more information.
+            </Box>
+            <Box textAlign="center" fontSize="heading-s">
+              ✣ Buy more and save more on eligible Yahoo Plus subscriptions—get
+              10%, 15% or 20% off your subscription fee. Terms apply.
+            </Box>
+          </SpaceBetween>
+        </SpaceBetween>
+      </div>
+      <div style={{ margin: "20px" }}>
+        <SpaceBetween size="m">
+          <Box fontSize="display-l" fontWeight="heavy" textAlign="center">
+            Take control of your portfolio
+          </Box>
+          <Box fontSize="heading-l" fontWeight="normal" textAlign="center">
+            Exclusive insights, advanced analytics and detailed company profiles
+            that help you take your portfolio to the next level.
+          </Box>
+          <ColumnLayout columns={2}>
+            <div style={{ maxWidth: "640px" }}>
+              <video controls width="640px" autoPlay={true} loop={true}>
+                <source
+                  src="https://s.aolcdn.com/membership/omp-static/biblio/projects/yahoo-plus/content/video-features/vids/yahoo-finance-plus-v10-no-rodeo-a-mixed.mp4"
+                  type="video/webm"></source>
+              </video>
+            </div>
+            <div style={{ margin: "20px" }}>
+              <SpaceBetween size="m">
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}>
+                  <div style={{ flex: "left" }}>
+                    <Icon name="unlocked" size="large" variant="success" />
+                  </div>
+                  <div style={{ maxWidth: "400px", flexWrap: "wrap" }}>
+                    <Box float="right" fontSize="heading-l" fontWeight="light">
+                      Get access to exclusive data and insights about companies
+                      you care about.
+                    </Box>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}>
+                  <div style={{ flex: "left" }}>
+                    <Icon name="suggestions" size="large" variant="success" />
+                  </div>
+                  <div style={{ maxWidth: "400px", flexWrap: "wrap" }}>
+                    <Box float="right" fontSize="heading-l" fontWeight="light">
+                      Advanced tools and charts optimize your trading strategy.
+                    </Box>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-evenly",
+                  }}>
+                  <div style={{ flex: "left" }}>
+                    <Icon name="menu" size="large" variant="success" />
+                  </div>
+                  <div style={{ maxWidth: "400px", flexWrap: "wrap" }}>
+                    <Box float="right" fontSize="heading-l" fontWeight="light">
+                      Intuitive data visualizations give you an expert
+                      perspective.
+                    </Box>
+                  </div>
+                </div>
+              </SpaceBetween>
+            </div>
+          </ColumnLayout>
+        </SpaceBetween>
+      </div>
+
+      <div style={{ margin: "20px" }}>
+        <SpaceBetween size="l">
+          <Box fontSize="display-l" textAlign="center" fontWeight="heavy">
+            Premium Features
+          </Box>
+          <Analysis />
+        </SpaceBetween>
+      </div>
+      <div style={{ margin: "20px" }}>
+        <SpaceBetween size="l">
+          <Box fontSize="display-l" textAlign="center" fontWeight="heavy">
+            Subscriber perks
+          </Box>
+          <Box fontSize="heading-l" textAlign="center" fontWeight="normal">
+            With a Yahoo Finance Plus subscription, you'll automatically qualify
+            for Yahoo Plus perks including fewer ads, premium tech support and
+            deep discounts.
+          </Box>
+          <Subscriber />
+        </SpaceBetween>
+      </div>
+      <div className="faqs">
+        <SpaceBetween size="m">
+          <Box fontSize="display-l" fontWeight="bold">Frequently asked questions</Box>
+          <Box fontSize="heading-l" fontWeight="bold">Want to know more about Yahoo Finance Plus? We've provided answers to our most commonly asked questions below.</Box>
+          <ExpandableSection headerText="What is Yahoo Finance Plus?" variant="footer" defaultExpanded>
+            <Box>Yahoo Finance Plus is a premium subscription service that provides actionable data and advanced tools for investors to trade with confidence. Yahoo Finance Plus is integrated into Yahoo Finance's existing desktop and app products where investors can chart, screen and analyze new data sets all in one place.</Box>
+          </ExpandableSection>
+          <ExpandableSection headerText="Will I lose access to free content on Yahoo Finance if I don't subscribe to Yahoo Finance Plus?" variant="footer">
+            <Box>Yes, Yahoo Finance Plus is available in desktop web, mobile web and mobile app.</Box>
+          </ExpandableSection>
+          <ExpandableSection headerText="Is Yahoo Finance Plus content personalized to my account?" variant="footer">
+            <Box>Yes, your membership offers access to a personalized dashboard with both trending and relevant content. We surface trade ideas and research reports for the companies you follow and that you have visited recently.</Box>
+          </ExpandableSection>
+          <ExpandableSection headerText="How often is Yahoo Finance Plus data updated?" variant="footer">
+            <Box>Advanced charting, fair value and portfolio analytics data are updated in real time. Research reports and trade ideas are released daily. Company Outlook data is updated on an ongoing basis.</Box>
+          </ExpandableSection>
+          <ExpandableSection headerText="I currently subscribe to Yahoo Finance Premium. What happens to my subscription?" variant="footer">
+            <Box>We hope you're enjoying your subscription. Yahoo Finance Premium will be re-named Yahoo Finance Plus Essential. You'll get the same features you know and love plus added Yahoo Plus perks like fewer ads across the entire Yahoo network, support, and deep discounts—all for the same price as your existing subscription without lifting a finger.</Box>
+          </ExpandableSection>
+          <ExpandableSection headerText="How do I manage my Yahoo Finance Plus subscription?" variant="footer">
+            <Box>As a Yahoo Plus subscriber with the Ad-Free perk, you may still see limited ads on search.yahoo.com, login.yahoo.com and other Yahoo properties due to contractual obligations related to certain ad types. As such, the above notwithstanding, ads that are normally displayed are removed to give you more room to focus with fewer distractions. To enable the Ad-Free experience on your Yahoo mobile apps, please make sure the latest version of the app is installed on your device.</Box>
+          </ExpandableSection>
+          <ExpandableSection headerText="What's included with the 24/7 general account support subscriber perk?" variant="footer">
+            <Box>Yahoo Plus subscriptions include 24/7 support for general account inquiries* including billing, account recovery and updating account information. Product-specific support options and hours of operation are limited for Mail, Finance and Fantasy Sports</Box>
+          </ExpandableSection>
+          </SpaceBetween>
+      </div>
+    </Grid>
   );
 };
 
@@ -679,14 +412,14 @@ const HomePage = (props): JSX.Element => {
   // https://reactrouter.com/docs/en/v6/api#outlet
   return (
     <>
-      <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
-        <AppHeader {...props} />
+      <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
+        <CommonHeader {...props} />
       </div>
       <AppLayout
         content={
           <>
             {!loading ? (
-              <SpaceBetween size="s">
+              <SpaceBetween size="m">
                 <HomeFeatures loadHelpPanelContent={loadHelpPanelContent} />
               </SpaceBetween>
             ) : (
@@ -699,6 +432,7 @@ const HomePage = (props): JSX.Element => {
         toolsOpen={toolsOpen}
         tools={toolsContent}
         navigationHide={true}
+        toolsHide={true}
         onToolsChange={({ detail }) => setToolsOpen(detail.open)}
         ariaLabels={appLayoutLabels}
         footerSelector="#f"
