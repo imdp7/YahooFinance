@@ -28,7 +28,9 @@ interface State {
   signOut: () => void;
 }
 const BASE_URL = "https://yh-finance.p.rapidapi.com/auto-complete?q=";
-const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
+const TRENDING_URL =
+  "https://yh-finance.p.rapidapi.com/market/get-trending-tickers?";
+const KEY_URL = `region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 
 function TopNavigations(props: State): JSX.Element {
   const [mode, setMode] = useState(false);
@@ -37,6 +39,7 @@ function TopNavigations(props: State): JSX.Element {
   const [redirectURL, setRedirectURL] = useState("");
   const [visible, setVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [trending, setTrending] = useState([]);
   const [options, setOptions] = useState([]);
   const [debounceValue, setDebounceValue] = useState("");
   const [status, setStatus] = useState("pending");
@@ -66,9 +69,9 @@ function TopNavigations(props: State): JSX.Element {
       if (inputValue.length > 0) {
         try {
           setStatus("loading");
-          const res = await axios.get(`${BASE_URL}${inputValue}${KEY_URL}`);
+          const res = await axios.get(`${BASE_URL}${inputValue}&${KEY_URL}`);
           const data = res.data;
-          console.log(res.data);
+
           // Create the updated options array with the desired structure
           const updatedOptions = [
             {
@@ -86,7 +89,6 @@ function TopNavigations(props: State): JSX.Element {
                 label: option?.title,
                 iconUrl: option?.thumbnail?.resolutions[1]?.url,
                 // iconAlt: option?.thumbnail?.resolutions[0]?.url
-
               })),
             },
           ];
@@ -97,12 +99,37 @@ function TopNavigations(props: State): JSX.Element {
           setStatus("error");
         }
       } else {
-        setOptions([]);
+        try {
+          setStatus("loading");
+          const res = await axios.get(`${TRENDING_URL}${KEY_URL}`);
+          const data = res.data?.finance?.result[0]?.quotes;
+          const updatedOptions = [
+            {
+              label: "Trending Quotes",
+              options: data?.map((option) => ({
+                value: option?.symbol, // Replace `option.value` with the correct property name
+                label: option?.symbol,
+                labelTag: option?.shortName,
+              })),
+            },
+          ];
+          setOptions(updatedOptions);
+          setStatus("finished");
+        } catch (error) {
+          setStatus("error");
+        }
       }
     };
 
     fetchData();
   }, [debounceValue]);
+
+  const handleSelectOption = ({ detail }) => {
+    const selectedValue = detail.value;
+    if (selectedValue === inputValue) {
+      navigate(`/stocks/${selectedValue}`);
+    }
+  };
 
   return (
     <>
@@ -173,15 +200,10 @@ function TopNavigations(props: State): JSX.Element {
           search={
             <Autosuggest
               onChange={({ detail }) => setInputValue(detail.value)}
-              onSelect={({detail}) => {
-                if(detail.value !== inputValue){
-                  return
-                }
-                navigate(`/stocks/${inputValue}`)
-              }}
-              value={inputValue}
+              onSelect={handleSelectOption}
+              value={inputValue.toUpperCase()}
               options={options}
-              enteredTextLabel={(value) => `"Use: ${value}"`}
+              enteredTextLabel={(value) => `Select the symbol: "${value}"`}
               ariaLabel="Autosuggest example with suggestions"
               placeholder="Search for news, stocks or companies"
               empty="No match found"

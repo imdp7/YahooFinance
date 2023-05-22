@@ -53,7 +53,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
   };
   const fetchRecommend = async () => {
     try {
-      const res = await axios.request(
+      const res = await axios.get(
         `${RECOMMEND_URL}symbol=${symbol}${KEY_URL}`
       );
       const data = res.data?.finance?.result[0]?.quotes;
@@ -165,6 +165,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
               EDT. Market open.
             </Box>
           </SpaceBetween>
+            {profile?.price?.postMarketPrice?.fmt && (
           <SpaceBetween size="s">
             <SpaceBetween size="m" direction="horizontal">
               <Box fontSize="heading-xl" fontWeight="bold">
@@ -200,6 +201,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
               {convertUnixTimestampToTime(profile?.price?.postMarketTime)} EDT.
             </Box>
           </SpaceBetween>
+            )}
         </SpaceBetween>
       </Container>
       <Tabs
