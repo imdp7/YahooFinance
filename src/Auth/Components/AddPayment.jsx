@@ -1060,7 +1060,7 @@ const Content = (props) => {
                         justifyContent: "space-between",
                       }}>
                       <Box fontSize="heading-s" fontWeight="bold">
-                      {type == "2" ? "Annual subscription fee:" : "Monthly subscription fee"}
+                      {type == "1" ? "Annual subscription fee:" : "Monthly subscription fee:"}
                       </Box>
                       <Box fontSize="heading-s" fontWeight="bold">
                         {type == "1" ? "$350.00" : "$35.00"}

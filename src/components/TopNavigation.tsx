@@ -128,6 +128,7 @@ function TopNavigations(props: State): JSX.Element {
     const selectedValue = detail.value;
     if (selectedValue === inputValue) {
       navigate(`/stocks/${selectedValue}`);
+      setInputValue("")
     }
   };
 
