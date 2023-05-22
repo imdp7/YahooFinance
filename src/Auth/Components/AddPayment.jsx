@@ -52,6 +52,7 @@ const Content = (props) => {
   const [accountNo, setAccountNo] = useState(null);
   const [reAccountNo, setReAccountNo] = useState(null);
   const [accountName, setAccountName] = useState(null);
+  const [status, setStatus] = useState("");
   const options = useMemo(() => countryList().getData(), []);
   const stripe = new Stripe(
     "sk_test_51FrsMEJyECnw5rCL4g5bJkAmDbIWUonjxMQG1h6NDhCaDQ9e29456MxLFFmWRZCf30PZILvtaP0J4FXvHdieWO8e0092YqW109"
@@ -175,37 +176,34 @@ const Content = (props) => {
           email: email,
           limit: 1,
         });
-
+      
         if (customer.data.length > 0) {
           // Customer already exists, do not proceed with payment
           setErrorMessage("Customer already exists, login to make the payment");
           return false;
         } else {
-          // await stripe.paymentMethods.attach(paymentMethod.id, {customer: customer.id});
-          // Customer does not exist, proceed with payment
-          // Create a new customer
-          const newCustomer = await stripe.customers.create({
-            email: email,
-            name: name,
-            payment_method: paymentMethod.id,
-            invoice_settings: {
-              default_payment_method: paymentMethod.id,
-            },
-          });
-          const subscription = await stripe.subscriptions.create({
-            customer: newCustomer.id,
-            description: `Plan - ${type}`,
-            trial_period_days: 14,
-            items: [
-              {
-                price: planPrice,
+          try {
+            // Customer does not exist, proceed with payment
+            // Create a new customer
+            const newCustomer = await stripe.customers.create({
+              email: email,
+              name: name,
+              payment_method: paymentMethod.id,
+              invoice_settings: {
+                default_payment_method: paymentMethod.id,
               },
-            ],
-          });
-
-          if (error) {
-            setErrorMessage("Payment failed:", error);
-          } else {
+            });
+            const subscription = await stripe.subscriptions.create({
+              customer: newCustomer.id,
+              description: `Plan - ${type}`,
+              trial_period_days: 14,
+              items: [
+                {
+                  price: planPrice,
+                },
+              ],
+            });
+      
             // Send invoices and receipt to the customer
             const invoice = await stripe.invoices.create({
               customer: newCustomer.id,
@@ -214,13 +212,40 @@ const Content = (props) => {
               days_until_due: 2, //Number of days before invoice is due
             });
             await stripe.invoices.sendInvoice(invoice.id);
-            // await stripe.invoices.sendInvoiceReceipt(subscription.latest_invoice);
-            alert("Subscription created successfully");
+            setStatus("success");
+      
+            // Create a subscription object
+            const subscriptions = {
+              customer: newCustomer,
+              subType: subscription,
+              invoice: invoice,
+              subscriptionStatus: "success",
+            };
+      
+            // Send the subscription data to the server
+            const response = await fetch("http://127.0.0.1:3000/api/subscribe", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ subscriptions }),
+            });
+      
+            console.log(response)
+            if (response.ok) {
+              alert("Subscription successful");
+              // Handle success, such as redirecting to a success page
+            } else {
+              alert("Subscription failed");
+              // Handle failure, such as displaying an error message
+            }
+          } catch (error) {
+            setErrorMessage("Payment failed:", error);
           }
         }
       } catch (e) {
         setErrorMessage(e.message);
-      }
+      }       
     } catch (error) {
       setErrorMessage(error.message);
       setError(true);
@@ -613,7 +638,7 @@ const Content = (props) => {
                       errorMessage.includes("email address") &&
                       errorMessage
                     }>
-                   <Input
+                    <Input
                       className="input-width-card"
                       value={email}
                       step={14}
@@ -908,7 +933,9 @@ const Content = (props) => {
                       onChange={({ detail }) => setPhone(detail.value)}
                     />
                   </FormField>
-                  <FormField label="Billing contact email - optional" errorText={
+                  <FormField
+                    label="Billing contact email - optional"
+                    errorText={
                       errorMessage &&
                       errorMessage.includes("email address") &&
                       errorMessage

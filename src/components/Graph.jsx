@@ -32,7 +32,7 @@ export function Graph(props) {
       const data = response?.data?.chart?.result[0];
       setGraphData(data);
     } catch (e) {
-      console.log(e);
+      console.log(e)
     }
   };
 
@@ -41,18 +41,19 @@ export function Graph(props) {
     fetchData();
     setLoading('finished');
   }, []);
-  const timestamp = graphData && graphData?.timestamp;
-  const adjclose =
-    graphData &&
-    graphData?.indicators?.adjclose[0] &&
-    graphData?.indicators?.adjclose[0]?.adjclose;
-  const valueData = timestamp?.map((timestamp, index) => {
-    return {
+
+const timestamps = graphData?.timestamp || [];
+const prices = graphData?.indicators?.adjclose[0]?.adjclose || [];
+
+  const transformData = (timestamps, prices) => {
+    if(timestamps.length !== prices.length){
+      throw new Error("Timestamp ad prices arrays doesn't match the same length")
+    }
+    return timestamps?.map((timestamp, index) => ({
       x: new Date(timestamp),
-      y: adjclose[index],
-    };
-  });
-  // console.log(valueData);
+      y: prices[index],
+    }))
+  }
   return (
     <LineChart
       statusType={loading}
@@ -61,48 +62,12 @@ export function Graph(props) {
       recoveryText="Retry"
       series={[
         {
-          title: 'Site 1',
           type: 'line',
-          data: [
-            { x: new Date(1601006400000), y: 58020 },
-            { x: new Date(1601007300000), y: 102402 },
-            { x: new Date(1601008200000), y: 104920 },
-            { x: new Date(1601009100000), y: 94031 },
-            { x: new Date(1601010000000), y: 125021 },
-            { x: new Date(1601010900000), y: 159219 },
-            { x: new Date(1601011800000), y: 193082 },
-            { x: new Date(1601012700000), y: 162592 },
-            { x: new Date(1601013600000), y: 274021 },
-            { x: new Date(1601014500000), y: 264286 },
-            { x: new Date(1601015400000), y: 289210 },
-            { x: new Date(1601016300000), y: 256362 },
-            { x: new Date(1601017200000), y: 257306 },
-            { x: new Date(1601018100000), y: 186776 },
-            { x: new Date(1601019000000), y: 294020 },
-            { x: new Date(1601019900000), y: 385975 },
-            { x: new Date(1601020800000), y: 486039 },
-            { x: new Date(1601021700000), y: 490447 },
-            { x: new Date(1601022600000), y: 361845 },
-            { x: new Date(1601023500000), y: 339058 },
-            { x: new Date(1601024400000), y: 298028 },
-            { x: new Date(1601025300000), y: 231902 },
-            { x: new Date(1601026200000), y: 224558 },
-            { x: new Date(1601027100000), y: 253901 },
-            { x: new Date(1601028000000), y: 102839 },
-            { x: new Date(1601028900000), y: 234943 },
-            { x: new Date(1601029800000), y: 204405 },
-            { x: new Date(1601030700000), y: 190391 },
-            { x: new Date(1601031600000), y: 183570 },
-            { x: new Date(1601032500000), y: 162592 },
-            { x: new Date(1601033400000), y: 148910 },
-            { x: new Date(1601034300000), y: 229492 },
-            { x: new Date(1601035200000), y: 293910 },
-          ],
+          data: transformData(timestamps, prices)
         },
       ]}
-      xDomain={[new Date(1601006400000), new Date(1601035200000)]}
-      yDomain={[0, 500000]}
-      // yDomain={[summary?.dayLow?.fmt, summary?.dayHigh?.fmt]}
+      xDomain={[new Date(timestamps[0]), new Date(timestamps.length - 1)]}
+      yDomain={[Math.min(...prices), Math.max(...prices)]}
       i18nStrings={{
         filterLabel: 'Filter displayed data',
         filterPlaceholder: 'Filter data',
@@ -110,6 +75,11 @@ export function Graph(props) {
         detailPopoverDismissAriaLabel: 'Dismiss',
         legendAriaLabel: 'Legend',
         chartAriaRoleDescription: 'line chart',
+        xTickFormatter: (e) => new Intl.DateTimeFormat("en-US", {
+          hour: "numeric",
+          minute: 'numeric',
+          hour12:false,
+        }).format(e)
       }}
       ariaLabel="Single data series line chart"
       height={300}
@@ -117,6 +87,7 @@ export function Graph(props) {
       hideLegend
       xScaleType="time"
       xTitle="Time (EST)"
+      xTickFormatter={(e) => e.getHours()}
       yTitle={
         <SpaceBetween size="s" direction="horizontal">
           <Link>1D</Link>

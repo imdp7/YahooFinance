@@ -27,7 +27,14 @@ const awsmobile = {
     },
     "aws_cognito_verification_mechanisms": [
         "EMAIL"
-    ]
+    ],
+    aws_cognito_user_pool_attributes: {
+        // Add the desired custom attributes here
+        phone_number: 'phone_number',
+        picture: 'picture',
+        gender: 'gender',
+        address: 'address',
+      },
 };
 
 

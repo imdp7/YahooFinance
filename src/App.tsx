@@ -1,28 +1,42 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect } from 'react';
-import { Amplify, I18n } from 'aws-amplify';
-import { withAuthenticator, translations } from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
-import awsExports from './aws-exports';
-import './App.css';
-import HomePage from './HomPage';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import PageNotFound from './PageNotFound';
-import Home from './Pages/Home';
-import Stock from './Pages/Stock';
-import WatchlistDetail from './components/WatchlistDetail';
-import News from './Pages/News';
-import '@aws-amplify/ui-react/styles.css';
-import Payment from './components/common/Payment';
-import Account from './Auth/Components/Account';
+import React, { useEffect } from "react";
+import { Amplify, I18n, Auth } from "aws-amplify";
+import { withAuthenticator, translations } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import awsExports from "./aws-exports";
+import "./App.css";
+import HomePage from "./HomPage";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import PageNotFound from "./PageNotFound";
+import Home from "./Pages/Home";
+import Stock from "./Pages/Stock";
+import WatchlistDetail from "./components/WatchlistDetail";
+import News from "./Pages/News";
+import "@aws-amplify/ui-react/styles.css";
+import Payment from "./components/common/Payment";
+import Account from "./Auth/Components/Account";
 
 I18n.putVocabularies(translations);
-I18n.setLanguage('en');
+I18n.setLanguage("en");
 
 Amplify.configure(awsExports);
 const App = ({ user, signOut }) => {
   useEffect(() => {
-    document.title = 'Yahoo Finance';
+    document.title = "Yahoo Finance";
+    const fetchUserAttributes = async () => {
+      try {
+        // Get the currently authenticated user
+        const currentUser = await Auth.currentAuthenticatedUser();
+
+        // Retrieve specific user attributes
+        const userId = currentUser.attributes.sub;
+        console.log("User ID:", userId);
+      } catch (error) {
+        console.error("Error retrieving user attributes:", error);
+      }
+    };
+
+    fetchUserAttributes();
   }, []);
 
   return (
@@ -67,4 +81,20 @@ const App = ({ user, signOut }) => {
   );
 };
 
-export default withAuthenticator(App);
+export default withAuthenticator(App, {
+  signUpConfig: {
+    hiddenDefaults: ["email"],
+    signUpFields: [
+      // Add the desired custom attributes here
+      {
+        label: "Phone Number",
+        key: "phone_number",
+        required: true,
+        type: "phone_number",
+      },
+      { label: "Picture", key: "picture", required: true },
+      { label: "Gender", key: "gender", required: true },
+      { label: "Address", key: "address", required: true },
+    ],
+  },
+});

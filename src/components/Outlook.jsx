@@ -30,7 +30,6 @@ function Outlook(props) {
   React.useEffect(() => {
     fetchOutlook();
   }, []);
-  console.log(outlook);
   return (
     <Container
       header={

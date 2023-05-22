@@ -53,7 +53,7 @@ function TopNavigations(props: State): JSX.Element {
     navigate('/');
     props.signOut();
   } else if (redirectURL == 'profile') {
-    navigate('/account/profile');
+    navigate('/account');
   }
   const onFollowHandler = (e) => {
     e.preventDefault();

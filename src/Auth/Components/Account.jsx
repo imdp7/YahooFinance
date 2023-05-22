@@ -39,7 +39,6 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
       return <StatusIndicator type="error">{capital(status)}</StatusIndicator>;
     }
   };
-  console.log(activeSubscription)
   const timestamp = (timestamp) => {
     const date = new Date(timestamp * 1000);
     return timestamp ? date?.toLocaleDateString() : "-";
