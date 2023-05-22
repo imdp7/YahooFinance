@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   TopNavigation,
-  Input,
+  Autosuggest,
   Box,
   Toggle,
   FormField,
@@ -9,67 +9,196 @@ import {
   ColumnLayout,
   SpaceBetween,
   Modal,
-} from '@cloudscape-design/components';
-import classes from '../app.module.scss';
+} from "@cloudscape-design/components";
+import classes from "../app.module.scss";
 import {
   applyMode,
   Mode,
   Density,
   applyDensity,
   disableMotion,
-} from '@cloudscape-design/global-styles';
-import { connect } from 'react-redux';
-import { setMode, setDensity, setMotion } from '../app/actions';
-import { useNavigate } from 'react-router-dom';
-
+} from "@cloudscape-design/global-styles";
+import axios from "axios";
+import { connect } from "react-redux";
+import { setMode, setDensity, setMotion } from "../app/actions";
+import { useNavigate } from "react-router-dom";
+import { key, host } from "../../api";
 interface State {
   user: string;
   signOut: () => void;
 }
+const BASE_URL = "https://yh-finance.p.rapidapi.com/auto-complete?q=";
+const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 
-const mapStateToProps = (state) => {
-  return {
-    mode: state.mode,
-    density: state.density,
-    motion: state.motion,
-  };
-};
-const mapDispatchToProps = {
-  setMode,
-  setDensity,
-  setMotion,
-};
 function TopNavigations(props: State): JSX.Element {
   const [mode, setMode] = useState(false);
   const [density, setDensity] = useState(true);
   const [motion, setMotion] = useState(true);
-  const [searchValue, setSearchValue] = useState('');
-  const [redirectURL, setRedirectURL] = useState('');
+  const [redirectURL, setRedirectURL] = useState("");
   const [visible, setVisible] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+  const [options, setOptions] = useState([]);
+  const [debounceValue, setDebounceValue] = useState("");
+  const [status, setStatus] = useState("pending");
 
   const navigate = useNavigate();
 
-  if (redirectURL == 'signout') {
-    navigate('/');
+  if (redirectURL == "signout") {
+    navigate("/");
     props.signOut();
-  } else if (redirectURL == 'profile') {
-    navigate('/account');
+  } else if (redirectURL == "profile") {
+    navigate("/account");
   }
   const onFollowHandler = (e) => {
     e.preventDefault();
-    e.detail.id === 'preferences' ? setVisible(true) : null;
+    e.detail.id === "preferences" ? setVisible(true) : null;
   };
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounceValue(inputValue);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
+
+  React.useEffect(() => {
+    const fetchData = async () => {
+      if (inputValue.length > 0) {
+        try {
+          setStatus("loading");
+          const res = await axios.get(`${BASE_URL}${inputValue}${KEY_URL}`);
+          const data = res.data;
+          console.log(res.data);
+          // Create the updated options array with the desired structure
+          const updatedOptions = [
+            {
+              label: "Quotes",
+              options: data?.quotes.map((option) => ({
+                value: option?.symbol, // Replace `option.value` with the correct property name
+                label: option?.symbol,
+                labelTag: option?.shortname,
+              })),
+            },
+            {
+              label: "News",
+              options: data?.news.map((option) => ({
+                value: option?.title, // Replace `option.value` with the correct property name
+                label: option?.title,
+                iconUrl: option?.thumbnail?.resolutions[1]?.url,
+                // iconAlt: option?.thumbnail?.resolutions[0]?.url
+
+              })),
+            },
+          ];
+
+          setOptions(updatedOptions);
+          setStatus("finished");
+        } catch (error) {
+          setStatus("error");
+        }
+      } else {
+        setOptions([]);
+      }
+    };
+
+    fetchData();
+  }, [debounceValue]);
 
   return (
     <>
-      <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
+      <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
+        <TopNavigation
+          identity={{
+            href: "/",
+            logo: {
+              src: "https://public.flourish.studio/uploads/4e293af7-8464-45d7-9428-a96963909e42.png",
+              alt: "YH",
+            },
+          }}
+          utilities={[
+            {
+              type: "button",
+              iconName: "notification",
+              title: "Notifications",
+              ariaLabel: "Notifications (unread)",
+              badge: true,
+              disableUtilityCollapse: false,
+            },
+            {
+              type: "menu-dropdown",
+              text: "Account",
+              description: `${props.user}`,
+              iconName: "user-profile",
+              onItemClick: (evt) => {
+                setRedirectURL(evt.detail.id);
+                onFollowHandler(evt);
+              },
+              items: [
+                { id: "profile", text: "Profile" },
+                { id: "preferences", text: "Preferences" },
+                { id: "security", text: "Security" },
+                {
+                  id: "support-group",
+                  text: "Support",
+                  items: [
+                    {
+                      id: "documentation",
+                      text: "Documentation",
+                      href: "#",
+                      external: true,
+                      externalIconAriaLabel: " (opens in new tab)",
+                    },
+                    { id: "support", text: "Support" },
+                    {
+                      id: "feedback",
+                      text: "Feedback",
+                      href: "#",
+                      external: true,
+                      externalIconAriaLabel: " (opens in new tab)",
+                    },
+                  ],
+                },
+                { id: "signout", text: "Sign out" },
+              ],
+            },
+          ]}
+          i18nStrings={{
+            searchIconAriaLabel: "Search",
+            searchDismissIconAriaLabel: "Close search",
+            overflowMenuTriggerText: "More",
+            overflowMenuTitleText: "All",
+            overflowMenuBackIconAriaLabel: "Back",
+            overflowMenuDismissIconAriaLabel: "Close menu",
+          }}
+          search={
+            <Autosuggest
+              onChange={({ detail }) => setInputValue(detail.value)}
+              onSelect={({detail}) => {
+                if(detail.value !== inputValue){
+                  return
+                }
+                navigate(`/stocks/${inputValue}`)
+              }}
+              value={inputValue}
+              options={options}
+              enteredTextLabel={(value) => `"Use: ${value}"`}
+              ariaLabel="Autosuggest example with suggestions"
+              placeholder="Search for news, stocks or companies"
+              empty="No match found"
+              filteringType="auto"
+              statusType={status}
+              loadingText="Loading"
+              errorText="Error fetching results."
+              recoveryText="Retry"
+            />
+          }
+        />
         <Modal
           onDismiss={() => setVisible(false)}
           visible={visible}
           closeAriaLabel="Close modal"
           header="Preferences"
-          size="medium"
-        >
+          size="medium">
           <SpaceBetween size="s" direction="vertical">
             <ColumnLayout columns={3}>
               <FormField description="Light or Dark." label="Theme Mode">
@@ -79,9 +208,8 @@ function TopNavigations(props: State): JSX.Element {
                     applyMode(detail.checked ? Mode.Dark : Mode.Light);
                   }}
                   checked={mode}
-                  className={classes.app_header_footer}
-                >
-                  <Box>{mode ? 'Dark' : 'Light'}</Box>
+                  className={classes.app_header_footer}>
+                  <Box>{mode ? "Dark" : "Light"}</Box>
                 </Toggle>
               </FormField>
               <FormField description="Comfort or Compact." label="Density">
@@ -94,9 +222,8 @@ function TopNavigations(props: State): JSX.Element {
                     disableMotion(density ? true : false);
                   }}
                   checked={density}
-                  className={classes.app_header_footer}
-                >
-                  <Box>{density ? 'Comfort' : 'Compact'}</Box>
+                  className={classes.app_header_footer}>
+                  <Box>{density ? "Comfort" : "Compact"}</Box>
                 </Toggle>
               </FormField>
               <FormField description="True or False." label="Motion">
@@ -106,90 +233,16 @@ function TopNavigations(props: State): JSX.Element {
                     disableMotion(motion ? true : false);
                   }}
                   checked={motion}
-                  className={classes.app_header_footer}
-                >
-                  <Box>{motion ? 'True' : 'False'}</Box>
+                  className={classes.app_header_footer}>
+                  <Box>{motion ? "True" : "False"}</Box>
                 </Toggle>
               </FormField>
             </ColumnLayout>
           </SpaceBetween>
         </Modal>
-        <TopNavigation
-          identity={{
-            href: '/',
-            logo: {
-              src: 'https://public.flourish.studio/uploads/4e293af7-8464-45d7-9428-a96963909e42.png',
-              alt: 'YH',
-            },
-          }}
-          utilities={[
-            {
-              type: 'button',
-              iconName: 'notification',
-              title: 'Notifications',
-              ariaLabel: 'Notifications (unread)',
-              badge: true,
-              disableUtilityCollapse: false,
-            },
-            {
-              type: 'menu-dropdown',
-              text: 'Account',
-              description: `${props.user}`,
-              iconName: 'user-profile',
-              onItemClick: (evt) => {
-                setRedirectURL(evt.detail.id);
-                onFollowHandler(evt);
-              },
-              items: [
-                { id: 'profile', text: 'Profile' },
-                { id: 'preferences', text: 'Preferences' },
-                { id: 'security', text: 'Security' },
-                {
-                  id: 'support-group',
-                  text: 'Support',
-                  items: [
-                    {
-                      id: 'documentation',
-                      text: 'Documentation',
-                      href: '#',
-                      external: true,
-                      externalIconAriaLabel: ' (opens in new tab)',
-                    },
-                    { id: 'support', text: 'Support' },
-                    {
-                      id: 'feedback',
-                      text: 'Feedback',
-                      href: '#',
-                      external: true,
-                      externalIconAriaLabel: ' (opens in new tab)',
-                    },
-                  ],
-                },
-                { id: 'signout', text: 'Sign out' },
-              ],
-            },
-          ]}
-          i18nStrings={{
-            searchIconAriaLabel: 'Search',
-            searchDismissIconAriaLabel: 'Close search',
-            overflowMenuTriggerText: 'More',
-            overflowMenuTitleText: 'All',
-            overflowMenuBackIconAriaLabel: 'Back',
-            overflowMenuDismissIconAriaLabel: 'Close menu',
-          }}
-          search={
-            <Input
-              type="search"
-              placeholder="Search for news, symbols or companies"
-              ariaLabel="Search"
-              value={searchValue}
-              onChange={({ detail }) => setSearchValue(detail.value)}
-            />
-          }
-        />
       </div>
     </>
   );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TopNavigations);
+export default TopNavigations;

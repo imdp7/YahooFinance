@@ -274,8 +274,8 @@ const HomeFeatures = ({ loadHelpPanelContent }): JSX.Element => {
             that help you take your portfolio to the next level.
           </Box>
           <ColumnLayout columns={2}>
-            <div style={{ maxWidth: "640px" }}>
-              <video controls width="640px" autoPlay={true} loop={true}>
+            <div style={{ maxWidth: "640px"}}>
+              <video controls width="640px" autoPlay={true} loop={true} style={{objectFit:'contain'}}>
                 <source
                   src="https://s.aolcdn.com/membership/omp-static/biblio/projects/yahoo-plus/content/video-features/vids/yahoo-finance-plus-v10-no-rodeo-a-mixed.mp4"
                   type="video/webm"></source>

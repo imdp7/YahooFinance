@@ -112,15 +112,15 @@ function Insights(props) {
           data={[
             {
               title: props.title,
-              percentage: props?.value * 100,
-              value: props?.value * 100,
+              percentage: (props?.value * 100).toFixed(2),
+              value: (props?.value * 100).toFixed(2),
               color: props?.color
                 ? colorChartsStatusHigh
                 : colorChartsStatusPositive,
             },
             {
-              percentage: 100 - props?.value * 100,
-              value: 100 - props?.value * 100,
+              percentage: (100 - props?.value * 100).toFixed(2),
+              value: (100 - props?.value * 100).toFixed(2),
               color: colorChartsStatusNeutral,
             },
           ]}

@@ -68,7 +68,7 @@ function Outlook(props) {
             </FormField>
             <FormField label="Sector Avg">
               <Box fontWeight="bold">
-                {outlook?.innovations?.sectorAvg.toFixed(2)}
+                {outlook?.innovations?.sectorAvg?.toFixed(2)}
               </Box>
             </FormField>
             <FormField label="Score">
