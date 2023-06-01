@@ -6,22 +6,21 @@ function MarketHolidays() {
   const [holidays, setHolidays] = React.useState([]);
 
   React.useEffect(() => {
-	setLoading(true)
     const fetchHolidays = async () => {
       try {
+        setLoading(true)
         const response = await axios.get(
           "https://api.polygon.io/v1/marketstatus/upcoming?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE"
         );
         const sum = response?.data;
         setHolidays(sum);
-        console.log(holidays);
+        setLoading(false)
       } catch (e) {
         console.log(e);
       }
     };
 
     fetchHolidays();
-    setLoading(false)
   }, []);
   return (
     <Table
@@ -60,6 +59,18 @@ function MarketHolidays() {
       items={holidays || []}
       loadingText="Loading Resources"
       loading={loading}
+      empty={
+        <Box textAlign="center" color="inherit">
+          <b>No Data, try again</b>
+          <Box
+            padding={{ bottom: "s" }}
+            variant="p"
+            color="inherit"
+          >
+            No resources to display.
+          </Box>
+        </Box>
+      }
     />
   );
 }

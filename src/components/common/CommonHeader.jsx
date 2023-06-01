@@ -1,7 +1,17 @@
 import React from 'react'
 import {TopNavigation} from "@cloudscape-design/components";
-
+import { useNavigate } from "react-router-dom"
 function CommonHeader(props) {
+  const [redirectURL, setRedirectURL] = React.useState("");
+  const navigate = useNavigate();
+
+  if (redirectURL == "signout") {
+    navigate("/");
+    props.signOut();
+  } else if (redirectURL == "profile") {
+    navigate("/account");
+  }
+
   return (
     <div>
 	<TopNavigation
@@ -45,6 +55,9 @@ function CommonHeader(props) {
           text: "Account",
           description: props.user,
           iconName: "user-profile",
+          onItemClick: (evt) => {
+                setRedirectURL(evt.detail.id);
+              },
           items: [
             { id: "profile", text: "Profile" },
             { id: "preferences", text: "Preferences" },

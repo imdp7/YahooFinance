@@ -16,7 +16,7 @@ router.get("/", (req, res) => {
     });
 });
 
-// API get customer data
+// API get customer data through sub
 router.get("/:sub", async (req, res) => {
   const sub = req.params.sub;
 

@@ -235,6 +235,7 @@ const Content = (props) => {
             if (response.ok) {
               alert("Subscription successful");
               // Handle success, such as redirecting to a success page
+              navigate("/");
             } else {
               alert("Subscription failed");
               // Handle failure, such as displaying an error message

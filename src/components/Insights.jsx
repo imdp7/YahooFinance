@@ -118,6 +118,9 @@ function Insights(props) {
               color: colorChartsStatusNeutral,
             },
           ]}
+          detailPopoverContent={(datum, sum) => [
+        { key: "Perceentage", value: datum.value },
+      ]}
           i18nStrings={{
             detailsValue: "Value",
             detailsPercentage: "Percentage",
@@ -136,7 +139,7 @@ function Insights(props) {
           hideFilter
           hideLegend
           hideTitles
-          innerMetricValue={`${props?.value * 100}%`}
+          innerMetricValue={`${(props?.value * 100).toFixed(2)}%`}
           loadingText="Loading chart"
           recoveryText="Retry"
           size={props?.size}

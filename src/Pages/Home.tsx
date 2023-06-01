@@ -40,8 +40,8 @@ const Content = ({ summary, handleModalOpen }) => {
           { colspan: { l: 12, m: 12, default: 12 } },
           { colspan: { l: 12, m: 12, default: 12 } },
           { colspan: { l: 8, m: 8, default: 12 } },
-          { colspan: { l: 4, m: 4, default: 12 } },
-          { colspan: { l: 4, m: 4, default: 12 } },
+          // { colspan: { l: 4, m: 4, default: 12 } },
+          // { colspan: { l: 4, m: 4, default: 12 } },
         ]}>
         <Container>
           <div className="container-items">
@@ -63,12 +63,15 @@ const Content = ({ summary, handleModalOpen }) => {
           </div>
         </Container>
         <SpaceBetween size="m" direction="horizontal">
-          <Button onClick={() => handleModalOpen(MarketHolidays, 'Market Holidays')}>
+          <Button
+            onClick={() => handleModalOpen(MarketHolidays, "Market Holidays")}>
             Upcoming Holidays
           </Button>
           <Button>Upcoming Earnings</Button>
         </SpaceBetween>
-        <SpaceBetween size="m">{/* <Movers /> */}</SpaceBetween>
+        <SpaceBetween size="m">
+          {/* <Movers /> */}
+        </SpaceBetween>
       </Grid>
     </SpaceBetween>
   );

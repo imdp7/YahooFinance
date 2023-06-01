@@ -46,10 +46,10 @@ function TopNavigations(props: State): JSX.Element {
 
   const navigate = useNavigate();
 
-  if (redirectURL == "signout") {
-    navigate("/");
+  if (redirectURL === "signout") {
+    navigate('/');
     props.signOut();
-  } else if (redirectURL == "profile") {
+  } else if (redirectURL === "profile") {
     navigate("/account");
   }
   const onFollowHandler = (e) => {
@@ -128,13 +128,17 @@ function TopNavigations(props: State): JSX.Element {
     const selectedValue = detail.value;
     if (selectedValue === inputValue) {
       navigate(`/stocks/${selectedValue}`);
-      setInputValue("")
+      setInputValue("");
     }
   };
 
   return (
     <>
-      <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
+      <div
+        id="h"
+        style={{ position: "sticky", top: 0, zIndex: 1002 }}
+        onScroll={(e) => e.preventDefault()} // Add onScroll listener with preventDefault to avoid passive event listener warning
+      >
         <TopNavigation
           identity={{
             href: "/",

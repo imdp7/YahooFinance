@@ -36,6 +36,26 @@ const subscriptionSchema = new mongoose.Schema({
 
 const Subscription = mongoose.model("Subscription", subscriptionSchema);
 
+// API get customer data through email
+router.get("/q", (req, res) => {
+  const email = req.query.email; // Get the email query parameter
+
+  Subscription.findOne({ "customer.email": email })
+    .then((subscription) => {
+      if (subscription) {
+        res.setHeader("Content-Type", "application/json");
+        res.json(subscription);
+      } else {
+        res.status(404).json({ message: "Subscription not found" });
+      }
+    })
+    .catch((error) => {
+      console.error("Error retrieving subscription:", error);
+      res.sendStatus(500);
+    });
+});
+
+
 // API endpoint to handle subscription data
 router.post("/", (req, res) => {
   const subscription = req.body.subscriptions;
@@ -82,31 +102,31 @@ router.get("/", (req, res) => {
     });
 });
 
-// API endpoint to get all customer through any value
-router.get("/", (req, res) => {
-  const query = req.query; // Get the query parameters from the request
+ // API endpoint to get all customer through any value
+// router.get("/", (req, res) => {
+//   const query = req.query; // Get the query parameters from the request
 
-  Subscription.find({
-    $or: [
-      { customer: { $regex: new RegExp(query, "i") } },
-      { subType: { $regex: new RegExp(query, "i") } },
-      { invoice: { $regex: new RegExp(query, "i") } },
-      { subscriptionStatus: { $regex: new RegExp(query, "i") } },
-    ],
-  })
-    .then((customers) => {
-      if (customers.length > 0) {
-        res.setHeader("Content-Type", "application/json");
-        res.json(customers);
-      } else {
-        res.status(404).json({ message: "Customers not found" });
-      }
-    })
-    .catch((error) => {
-      console.error("Error searching for customers:", error);
-      res.sendStatus(500);
-    });
-});
+//   Subscription.find({
+//     $or: [
+//       { customer: { $regex: new RegExp(query, "i") } },
+//       { subType: { $regex: new RegExp(query, "i") } },
+//       { invoice: { $regex: new RegExp(query, "i") } },
+//       { subscriptionStatus: { $regex: new RegExp(query, "i") } },
+//     ],
+//   })
+//     .then((customers) => {
+//       if (customers.length > 0) {
+//         res.setHeader("Content-Type", "application/json");
+//         res.json(customers);
+//       } else {
+//         res.status(404).json({ message: "Customers not found" });
+//       }
+//     })
+//     .catch((error) => {
+//       console.error("Error searching for customers:", error);
+//       res.sendStatus(500);
+//     });
+// });
 
 // API endpoint to delete a customer subscription
 router.delete("/:id", (req, res) => {
