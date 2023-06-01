@@ -191,6 +191,7 @@ const TableIncome = ({
       visibleColumns={preferences.visibleContent}
       contentDensity={preferences.contentDensity}
       loading={loading}
+      stickyColumns={{ first: 1, last: 0 }}
       columnDefinitions={columnDefinitions}
       items={data}
       loadingText="Loading resources"

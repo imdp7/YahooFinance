@@ -1,21 +1,10 @@
-import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-// import themes from './theme'
-// import regions './region'
+import { configureStore } from '@reduxjs/toolkit';
+import thunk from 'redux-thunk';
 import rootReducer from './reducers';
 
-export const store = configureStore({
-  reducer: {
-    // preferences: preferences,
-    //feature2Data: feature2DataReducer,
-    rootReducer: rootReducer,
-  },
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: [thunk],
 });
 
-export type AppDispatch = typeof store.dispatch;
-export type RootState = ReturnType<typeof store.getState>;
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
+export default store;

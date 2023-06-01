@@ -1,101 +1,102 @@
 import React from 'react';
-import { LineChart, Box } from '@cloudscape-design/components';
+import { AreaChart, Box, Button } from '@cloudscape-design/components';
 function Chart({ data }) {
   return (
-    <LineChart
+    <AreaChart
       series={[
         {
-          title: 'Site 1',
-          type: 'line',
+          title: "",
+          type: "area",
           data: [
-            { x: new Date(1601006400000), y: 58020 },
-            { x: new Date(1601007300000), y: 102402 },
-            { x: new Date(1601008200000), y: 104920 },
-            { x: new Date(1601009100000), y: 94031 },
-            { x: new Date(1601010000000), y: 125021 },
-            { x: new Date(1601010900000), y: 159219 },
-            { x: new Date(1601011800000), y: 193082 },
-            { x: new Date(1601012700000), y: 162592 },
-            { x: new Date(1601013600000), y: 274021 },
-            { x: new Date(1601014500000), y: 264286 },
-            { x: new Date(1601015400000), y: 289210 },
-            { x: new Date(1601016300000), y: 256362 },
-            { x: new Date(1601017200000), y: 257306 },
-            { x: new Date(1601018100000), y: 186776 },
-            { x: new Date(1601019000000), y: 294020 },
-            { x: new Date(1601019900000), y: 385975 },
-            { x: new Date(1601020800000), y: 486039 },
-            { x: new Date(1601021700000), y: 490447 },
-            { x: new Date(1601022600000), y: 361845 },
-            { x: new Date(1601023500000), y: 339058 },
-            { x: new Date(1601024400000), y: 298028 },
-            { x: new Date(1601025300000), y: 231902 },
-            { x: new Date(1601026200000), y: 224558 },
-            { x: new Date(1601027100000), y: 253901 },
-            { x: new Date(1601028000000), y: 102839 },
-            { x: new Date(1601028900000), y: 234943 },
-            { x: new Date(1601029800000), y: 204405 },
-            { x: new Date(1601030700000), y: 190391 },
-            { x: new Date(1601031600000), y: 183570 },
-            { x: new Date(1601032500000), y: 162592 },
-            { x: new Date(1601033400000), y: 148910 },
-            { x: new Date(1601034300000), y: 229492 },
-            { x: new Date(1601035200000), y: 293910 },
+            { x: new Date(1601006400000), y: 10413 },
+            { x: new Date(1601007300000), y: 26582 },
+            { x: new Date(1601008200000), y: 45593 },
+            { x: new Date(1601009100000), y: 65918 },
+            { x: new Date(1601010000000), y: 76223 },
+            { x: new Date(1601010900000), y: 62385 },
+            { x: new Date(1601011800000), y: 83330 },
+            { x: new Date(1601012700000), y: 127209 },
+            { x: new Date(1601013600000), y: 104802 },
+            { x: new Date(1601014500000), y: 145899 },
+            { x: new Date(1601015400000), y: 121375 },
+            { x: new Date(1601016300000), y: 112968 },
+            { x: new Date(1601017200000), y: 145263 },
+            { x: new Date(1601018100000), y: 139562 },
+            { x: new Date(1601019000000), y: 128343 },
+            { x: new Date(1601019900000), y: 122774 },
+            { x: new Date(1601020800000), y: 145396 },
+            { x: new Date(1601021700000), y: 176509 },
+            { x: new Date(1601022600000), y: 201006 },
+            { x: new Date(1601023500000), y: 196538 },
+            { x: new Date(1601024400000), y: 213773 },
+            { x: new Date(1601025300000), y: 205076 },
+            { x: new Date(1601026200000), y: 216369 },
+            { x: new Date(1601027100000), y: 159386 },
+            { x: new Date(1601028000000), y: 238852 },
+            { x: new Date(1601028900000), y: 207500 },
+            { x: new Date(1601029800000), y: 187110 },
+            { x: new Date(1601030700000), y: 314165 },
+            { x: new Date(1601031600000), y: 165653 },
+            { x: new Date(1601032500000), y: 175584 },
+            { x: new Date(1601033400000), y: 230042 },
+            { x: new Date(1601034300000), y: 293879 }
           ],
-          valueFormatter: function o(e) {
+          valueFormatter: function l(e) {
             return Math.abs(e) >= 1e9
-              ? (e / 1e9).toFixed(1).replace(/\.0$/, '') + 'G'
+              ? (e / 1e9).toFixed(1).replace(/\.0$/, "") +
+                  "G"
               : Math.abs(e) >= 1e6
-              ? (e / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'
+              ? (e / 1e6).toFixed(1).replace(/\.0$/, "") +
+                "M"
               : Math.abs(e) >= 1e3
-              ? (e / 1e3).toFixed(1).replace(/\.0$/, '') + 'K'
+              ? (e / 1e3).toFixed(1).replace(/\.0$/, "") +
+                "K"
               : e.toFixed(2);
-          },
-        },
-        {
-          title: 'Peak hours',
-          type: 'threshold',
-          x: new Date(1601025000000),
-        },
+          }
+        }
       ]}
-      xDomain={[new Date(1601006400000), new Date(1601035200000)]}
+      xDomain={[
+        new Date(1601006400000),
+        new Date(1601034300000)
+      ]}
       yDomain={[0, 500000]}
       i18nStrings={{
-        filterLabel: 'Filter displayed data',
-        filterPlaceholder: 'Filter data',
-        filterSelectedAriaLabel: 'selected',
-        detailPopoverDismissAriaLabel: 'Dismiss',
-        legendAriaLabel: 'Legend',
-        chartAriaRoleDescription: 'line chart',
-        xTickFormatter: (e) =>
+        detailPopoverDismissAriaLabel: "Dismiss",
+        chartAriaRoleDescription: "line chart",
+        xTickFormatter: e =>
           e
-            .toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              hour: 'numeric',
-              minute: 'numeric',
-              hour12: !1,
+            .toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              hour12: !1
             })
-            .split(',')
-            .join('\n'),
-        yTickFormatter: function o(e) {
+            .split(",")
+            .join("\n"),
+        yTickFormatter: function l(e) {
           return Math.abs(e) >= 1e9
-            ? (e / 1e9).toFixed(1).replace(/\.0$/, '') + 'G'
+            ? (e / 1e9).toFixed(1).replace(/\.0$/, "") +
+                "G"
             : Math.abs(e) >= 1e6
-            ? (e / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'
+            ? (e / 1e6).toFixed(1).replace(/\.0$/, "") +
+              "M"
             : Math.abs(e) >= 1e3
-            ? (e / 1e3).toFixed(1).replace(/\.0$/, '') + 'K'
+            ? (e / 1e3).toFixed(1).replace(/\.0$/, "") +
+              "K"
             : e.toFixed(2);
-        },
+        }
       }}
-      ariaLabel="Single data series line chart"
+      ariaLabel="Stacked area chart"
       errorText="Error loading data."
-      height={50}
+      height={25}
       hideFilter
       hideLegend
       loadingText="Loading chart"
       recoveryText="Retry"
       xScaleType="time"
+      xTitle=""
+      yTitle=""
       empty={
         <Box textAlign="center" color="inherit">
           <b>No data available</b>

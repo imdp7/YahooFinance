@@ -29,35 +29,36 @@ const Content = ({ state }) => {
     const ticker = term.split(':')[1];
     return ticker;
   };
+  console.log(state)
   return (
     <SpaceBetween size="m">
       <SpaceBetween size="xxs">
         <SpaceBetween size="l" direction="horizontal">
           <Box fontSize="heading-m" fontWeight="bold">
-            {state.author}
+            {state?.author}
           </Box>
           <Box fontSize="heading-m" fontWeight="bold">
-            {state.publisher}
+          <Link  external href={state.publisher.homepage_url}>
+            {state.publisher.name}
+          </Link>
           </Box>
         </SpaceBetween>
         <Box color="text-status-inactive">
-          {convertUnixTimestamp(state.published_at)}
+          {state.published_utc}
         </Box>
       </SpaceBetween>
       <FormField label="In this article:">
-        <Container>
           <SpaceBetween size="xs" direction="horizontal">
-            {state?.entities.map((e) => (
+            {state?.tickers.map((e) => (
               <div key={e?.term}>
-                <Link href={`/stocks/${getTicker(e)}`}>
+                <Link href={`/stocks/${e}`}>
                   <Badge className="badge-style" color="blue">
-                    {getTicker(e)}
+                    {e}
                   </Badge>
                 </Link>
               </div>
             ))}
           </SpaceBetween>
-        </Container>
       </FormField>
       {state?.streams?.map((s) => (
         <div className="video-stream" key={s.uuid}>

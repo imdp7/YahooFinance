@@ -5,8 +5,8 @@ import {
   Box,
   Grid,
 } from '@cloudscape-design/components';
-import { Graph, TrendGraph } from './Graph';
-import Articles from './Articles';
+import { Graph, BarGraph } from './Graph';
+import Article from './Article';
 import Movers from './Movers';
 import Table from './Table';
 import UpgradeDowngrade from './UpgradeDowngrade';
@@ -189,7 +189,7 @@ const Data = (props) => {
   );
 };
 const NewsSection = ({ symbol }) => {
-  return <Articles category={`${symbol}`} limit={20} />;
+  return <Article category={`${symbol}`} />;
 };
 function Summary(props) {
   return (
@@ -215,17 +215,17 @@ function Summary(props) {
         <SpaceBetween size="m">
           <Table
             header="Recommended Stocks"
-            recommend={props.recommend}
+            data={props.recommend}
             loadHelpPanelContent={props.loadHelpPanelContent}
           />
-          <TrendGraph
+          <BarGraph
             {...props}
             loadHelpPanelContent={props.loadHelpPanelContent}
           />
-          <TrendGraph
+          {/* <BarGraph
             {...props}
             loadHelpPanelContent={props.loadHelpPanelContent}
-          />
+          /> */}
           <Outlook
             {...props}
             loadHelpPanelContent={props.loadHelpPanelContent}

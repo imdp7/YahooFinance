@@ -3,7 +3,7 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const stripe = require("stripe")(
-  "sk_test_51FrsMEJyECnw5rCL4g5bJkAmDbIWUonjxMQG1h6NDhCaDQ9e29456MxLFFmWRZCf30PZILvtaP0J4FXvHdieWO8e0092YqW109"
+  process.env.STRIPE
 );
 
 router.use(bodyParser.json());
@@ -12,7 +12,7 @@ router.use(bodyParser.json());
 // const connectionString = 'mongodb+srv://cluster06576.3kwannj.mongodb.net';
 const databaseName = "YHFinance";
 const connectionString =
-  "mongodb+srv://Cluster06576:tQRQSEfMZgqDJ2ct@cluster06576.3kwannj.mongodb.net/?retryWrites=true&w=majority";
+  process.env.MONGODB_URL;
 mongoose
   .connect(connectionString, {
     useNewUrlParser: true,
@@ -108,20 +108,20 @@ router.get("/", (req, res) => {
     });
 });
 
-// API endpoint to delete a customer
+// API endpoint to delete a customer subscription
 router.delete("/:id", (req, res) => {
   const customerId = req.params.id;
 
   Subscription.findByIdAndDelete(customerId)
     .then((deletedCustomer) => {
       if (deletedCustomer) {
-        res.json({ message: "Customer deleted successfully" });
+        res.json({ message: "Customer's subscription deleted successfully" });
       } else {
-        res.status(404).json({ message: "Customer not found" });
+        res.status(404).json({ message: "Customer' subscription not found" });
       }
     })
     .catch((error) => {
-      console.error("Error deleting customer:", error);
+      console.error("Error deleting customer's subscription:", error);
       res.sendStatus(500);
     });
 });

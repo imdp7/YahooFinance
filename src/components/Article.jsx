@@ -15,7 +15,7 @@ const BASE_URL =
   'https://apidojo-yahoo-finance-v1.p.rapidapi.com/news/list?category=';
 const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 
-function Articles(props) {
+function Article(props) {
   const navigate = useNavigate();
   const [news, setNews] = useState([]);
 
@@ -27,10 +27,9 @@ function Articles(props) {
 
   const fetchNews = async () => {
     try {
-      const res = await axios.request(`${BASE_URL}${props.category}${KEY_URL}`);
-      const data = res.data.items.result;
-      const articles = data.slice(0, `${props.limit}`);
-      setNews(articles);
+      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${props.category}&limit=15&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`);
+      const data = res.data?.results;
+      setNews(data);
     } catch (error) {
       console.error(error);
     }
@@ -44,7 +43,7 @@ function Articles(props) {
   return (
     <SpaceBetween size="m">
       {news?.map((n) => (
-        <Container key={n?.uuid}>
+        <Container key={n?.id}>
           <SpaceBetween size="xxs" direction="vertical">
             <Grid
               gridDefinition={[
@@ -53,17 +52,17 @@ function Articles(props) {
               ]}
             >
               <img
-                src={n?.main_image?.original_url}
+                src={`${n?.image_url}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`}
                 style={{ maxWidth: '100%' }}
-                alt={n?.reference_id}
+                alt={n?.article_url}
                 className="article-image"
               />
               <div>
-                <Box float="right">{n.publisher}</Box>
+                <Box float="right">{n.publisher.name}</Box>
                 <Link
                   onFollow={() =>
-                    navigate(`/news/${n.uuid}`, {
-                      state: { uuid: n?.uuid, state: n },
+                    navigate(`/news/${n.id}`, {
+                      state: { uuid: n?.id, state: n },
                     })
                   }
                 >
@@ -71,16 +70,16 @@ function Articles(props) {
                     {n?.title}
                   </Box>
                 </Link>
-                <Box>{truncate(n.summary, 400)}</Box>
+                <Box>{truncate(n.description, 400)}</Box>
               </div>
             </Grid>
 
             <SpaceBetween size="xs" direction="horizontal">
-              {n.entities.map((e) => (
-                <div key={e?.term}>
-                  <Link href={`/stocks/${getTicker(e)}`}>
+              {n.tickers.map((e) => (
+                <div key={e}>
+                  <Link href={`/stocks/${e}`}>
                     <Badge className="badge-style" color="blue">
-                      {getTicker(e)}
+                      {e}
                     </Badge>
                   </Link>
                 </div>
@@ -93,4 +92,4 @@ function Articles(props) {
   );
 }
 
-export default Articles;
+export default Article;

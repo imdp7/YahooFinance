@@ -1,5 +1,5 @@
-import React from 'react';
-import TopNavigations from '../components/TopNavigation';
+import React from "react";
+import TopNavigations from "../components/TopNavigation";
 import {
   AppLayout,
   SpaceBetween,
@@ -11,47 +11,38 @@ import {
   Link,
   Tabs,
   Button,
-} from '@cloudscape-design/components';
-import PropTypes from 'prop-types';
-import Movers from '../components/Movers';
-import Articles from '../components/Articles';
-import PopularWatchlist from '../components/PopularWatchlist';
-import { key, host } from '../../api';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Chart from '../components/common/Chart';
+  Table,
+} from "@cloudscape-design/components";
+import PropTypes from "prop-types";
+import Movers from "../components/Movers";
+import Articles from "../components/Articles";
+import PopularWatchlist from "../components/PopularWatchlist";
+import { key, host } from "../../api";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Chart from "../components/common/Chart";
+import Modals from "../components/common/Modals";
+import MarketHolidays from "../components/Holidays";
 const i18nStrings = {
-  overflowMenuTriggerText: 'More',
-  overflowMenuTitleText: 'All',
+  overflowMenuTriggerText: "More",
+  overflowMenuTitleText: "All",
 };
-const BASE_URL = 'https://yh-finance.p.rapidapi.com/market/v2/get-summary?';
+const BASE_URL = "https://yh-finance.p.rapidapi.com/market/v2/get-summary?";
 const KEY_URL = `region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
-const Content = (props) => {
+
+const Content = ({ summary, handleModalOpen }) => {
   const navigate = useNavigate();
-  const [summary, setSummary] = React.useState([]);
-  const fetchSummary = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}${KEY_URL}`);
-      const sum = response?.data?.marketSummaryAndSparkResponse?.result;
-      setSummary(sum);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-  React.useEffect(() => {
-    fetchSummary();
-  }, []);
+
   return (
     <SpaceBetween size="m">
       <Grid
         gridDefinition={[
           { colspan: { l: 12, m: 12, default: 12 } },
-          // { colspan: { l: 12, m: 12, default: 12 } },
+          { colspan: { l: 12, m: 12, default: 12 } },
           { colspan: { l: 8, m: 8, default: 12 } },
           { colspan: { l: 4, m: 4, default: 12 } },
           { colspan: { l: 4, m: 4, default: 12 } },
-        ]}
-      >
+        ]}>
         <Container>
           <div className="container-items">
             {summary.map((sum) => (
@@ -65,37 +56,73 @@ const Content = (props) => {
                   <Box fontWeight="bold">
                     {sum?.regularMarketPreviousClose?.fmt}
                   </Box>
-                  {/* <Chart data={sum?.spark} /> */}
+                  <Chart data={sum?.spark} />
                 </SpaceBetween>
               </div>
             ))}
           </div>
         </Container>
-        {/* <Container
-          header={
-            <Header variant="h2" description="Container description">
-              Welcome {props.user}
-            </Header>
-          }
-        ></Container> */}
-        <Articles category={'generalnews'} limit="15" />
-        <SpaceBetween size="m">
-          <Movers />
+        <SpaceBetween size="m" direction="horizontal">
+          <Button onClick={() => handleModalOpen(MarketHolidays, 'Market Holidays')}>
+            Upcoming Holidays
+          </Button>
+          <Button>Upcoming Earnings</Button>
         </SpaceBetween>
+        <SpaceBetween size="m">{/* <Movers /> */}</SpaceBetween>
       </Grid>
     </SpaceBetween>
   );
 };
 
 function Home(props) {
-  const [activeTabId, setActiveTabId] = React.useState('home');
+  const [activeTabId, setActiveTabId] = React.useState("home");
+
+  const handleTabChange = ({ detail }) => {
+    setActiveTabId(detail.activeTabId);
+  };
+
+  const { href, ...otherProps } = props;
+  const [modalState, setModalState] = React.useState({
+    visible: false,
+    modalTitle: null,
+    modalComp: null,
+  });
+  const [summary, setSummary] = React.useState([]);
+
+  const fetchSummary = async () => {
+    try {
+      const response = await axios.get(`${BASE_URL}${KEY_URL}`);
+      const sum = response?.data?.marketSummaryAndSparkResponse?.result;
+      setSummary(sum);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchSummary();
+  }, []);
+
+  const handleModalOpen = (Component, title) => {
+    setModalState((prevState) => ({
+      ...prevState,
+      modalComp: Component,
+      visible: true,
+      modalTitle: title,
+    }));
+  };
+
+  const handleModalDismiss = () => {
+    setModalState((prevState) => ({ ...prevState, visible: false }));
+  };
+
   return (
     <>
-      <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
+      <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
         <TopNavigations
-          identity={{ href: '#' }}
+          identity={{ href }}
           i18nStrings={i18nStrings}
-          {...props}
+          {...otherProps}
         />
       </div>
       <AppLayout
@@ -108,28 +135,41 @@ function Home(props) {
             <ContentLayout>
               <SpaceBetween size="m">
                 <Tabs
-                  onChange={({ detail }) => setActiveTabId(detail.activeTabId)}
+                  onChange={handleTabChange}
                   activeTabId={activeTabId}
                   tabs={[
                     {
-                      label: 'Home',
-                      id: 'home',
-                      content: <Content {...props} />,
+                      label: "Home",
+                      id: "home",
+                      content: (
+                        <Content
+                          handleModalOpen={handleModalOpen}
+                          summary={summary}
+                        />
+                      ),
                     },
                     {
-                      label: 'Watchlist',
-                      id: 'watchlist',
+                      label: "Watchlist",
+                      id: "watchlist",
                       content: <PopularWatchlist />,
                     },
                     {
-                      label: 'News',
-                      id: 'news',
-                      content: <Articles category={'generalnews'} limit="15" />,
+                      label: "News",
+                      id: "news",
+                      content: <Articles category={"generalnews"} limit="15" />,
                     },
                   ]}
                 />
               </SpaceBetween>
             </ContentLayout>
+            {modalState.visible && (
+              <Modals
+                visible={modalState.visible}
+                setVisible={setModalState}
+                Component={modalState.modalComp}
+                title={modalState.modalTitle}
+              />
+            )}
           </SpaceBetween>
         }
       />

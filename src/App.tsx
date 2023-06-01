@@ -15,22 +15,36 @@ import News from "./Pages/News";
 import "@aws-amplify/ui-react/styles.css";
 import Payment from "./components/common/Payment";
 import Account from "./Auth/Components/Account";
+import { useDispatch } from "react-redux";
+import {addCustomer} from './app/actions'
 
 I18n.putVocabularies(translations);
 I18n.setLanguage("en");
 
 Amplify.configure(awsExports);
 const App = ({ user, signOut }) => {
+  const dispatch = useDispatch();
   useEffect(() => {
     document.title = "Yahoo Finance";
     const fetchUserAttributes = async () => {
       try {
         // Get the currently authenticated user
         const currentUser = await Auth.currentAuthenticatedUser();
-
-        // Retrieve specific user attributes
-        const userId = currentUser.attributes.sub;
-        console.log("User ID:", userId);
+        const userData = currentUser.attributes;
+        // Create a subscription object
+        const customer = {
+          email: userData.email,
+          email_verified: userData.email_verified,
+          sub: userData.sub,
+          wishlist: {
+            symbols: []
+          },
+          recentlyVisited: {
+            symbols: []
+          },
+        };
+        dispatch(addCustomer(customer));
+       
       } catch (error) {
         console.error("Error retrieving user attributes:", error);
       }
@@ -38,7 +52,6 @@ const App = ({ user, signOut }) => {
 
     fetchUserAttributes();
   }, []);
-
   return (
     <>
       <Router>
@@ -81,20 +94,4 @@ const App = ({ user, signOut }) => {
   );
 };
 
-export default withAuthenticator(App, {
-  signUpConfig: {
-    hiddenDefaults: ["email"],
-    signUpFields: [
-      // Add the desired custom attributes here
-      {
-        label: "Phone Number",
-        key: "phone_number",
-        required: true,
-        type: "phone_number",
-      },
-      { label: "Picture", key: "picture", required: true },
-      { label: "Gender", key: "gender", required: true },
-      { label: "Address", key: "address", required: true },
-    ],
-  },
-});
+export default withAuthenticator(App);
