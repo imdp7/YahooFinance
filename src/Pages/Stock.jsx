@@ -62,7 +62,6 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
       );
       const data = res.data.results;
       setPolygon(data);
-      console.log(polygon);
     } catch (error) {
       console.error(error);
     }
@@ -72,7 +71,6 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
       const res = await axios.get(`${BASE_URL}symbol=${symbol}${KEY_URL}`);
       const data = res.data;
       setProfile(data);
-      console.log(profile);
     } catch (error) {
       console.error(error);
     }
@@ -105,7 +103,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
   const addItemToWishlist = (symbol) => {
     dispatch(addToWishlist(symbol));
     // Make API request to add the symbol to the wishlist
-    fetch(`http://127.0.0.1:3000/api/customers/${customer.sub}`, {
+    fetch(`http://127.0.0.1:8087/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -134,7 +132,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
   const removeItemFromWishlist = (symbol) => {
     dispatch(removeFromWishlist(symbol));
     // Make API request to remove the symbol from the wishlist
-    fetch(`http://127.0.0.1:3000/api/customers/${customer.sub}`, {
+    fetch(`http://127.0.0.1:8087/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -163,7 +161,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
   const addRecentlyVisited = (symbol) => {
     dispatch(addToRecentlyVisited(symbol));
     // Make API request to remove the symbol from the wishlist
-    fetch(`http://127.0.0.1:3000/api/customers/${customer.sub}`, {
+    fetch(`http://127.0.0.1:8087/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -203,7 +201,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
           dispatch(setWishlistSymbols(savedSymbols));
         } else {
           const response = await fetch(
-            `http://127.0.0.1:3000/api/customers/${customer.sub}`
+            `http://127.0.0.1:8087/api/customers/${customer.sub}`
           );
           const data = await response.json();
           if (Array.isArray(data.wishlist.symbols)) {
@@ -214,7 +212,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
           dispatch(addToRecentlyVisited(recentSymbols));
         } else {
           const response = await fetch(
-            `http://127.0.0.1:3000/api/customers/${customer.sub}`
+            `http://127.0.0.1:8087/api/customers/${customer.sub}`
           );
           const data = await response.json();
           if (Array.isArray(data.recentlyVisited.symbols)) {
@@ -458,6 +456,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
             )}
           </SpaceBetween>
           <div>
+        {profile?.pageViews && (
             <SpaceBetween size="xl" direction="horizontal">
               <FormField label="Short Term">
                 <Box>{getIcon(profile?.pageViews?.shortTermTrend)}</Box>
@@ -469,6 +468,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
                 <Box>{getIcon(profile?.pageViews?.longTermTrend)}</Box>
               </FormField>
             </SpaceBetween>
+            )}
           </div>
         </div>
       </Container>

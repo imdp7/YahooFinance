@@ -14,10 +14,6 @@
   },
   "dependencies": {
     "@aws-amplify/ui-react": "^4.6.1",
-    "@awsui/collection-hooks": "^1.0.50",
-    "@awsui/components-react": "^3.0.788",
-    "@awsui/design-tokens": "^3.0.37",
-    "@awsui/global-styles": "^1.0.19",
     "@cloudscape-design/board-components": "^3.0.9",
     "@cloudscape-design/collection-hooks": "^1.0.20",
     "@cloudscape-design/components": "^3.0.243",

@@ -42,7 +42,7 @@ function TopNavigations(props: State): JSX.Element {
   const [trending, setTrending] = useState([]);
   const [options, setOptions] = useState([]);
   const [debounceValue, setDebounceValue] = useState("");
-  const [status, setStatus] = useState("pending");
+  const [status, setStatus] = useState("finished");
 
   const navigate = useNavigate();
 

@@ -40,8 +40,8 @@ const Content = ({ summary, handleModalOpen }) => {
           { colspan: { l: 12, m: 12, default: 12 } },
           { colspan: { l: 12, m: 12, default: 12 } },
           { colspan: { l: 8, m: 8, default: 12 } },
-          // { colspan: { l: 4, m: 4, default: 12 } },
-          // { colspan: { l: 4, m: 4, default: 12 } },
+          { colspan: { l: 4, m: 4, default: 12 } },
+          { colspan: { l: 4, m: 4, default: 12 } },
         ]}>
         <Container>
           <div className="container-items">
@@ -69,8 +69,9 @@ const Content = ({ summary, handleModalOpen }) => {
           </Button>
           <Button>Upcoming Earnings</Button>
         </SpaceBetween>
+        <Articles category="generalnews" limit="15"/>
         <SpaceBetween size="m">
-          {/* <Movers /> */}
+          <Movers />
         </SpaceBetween>
       </Grid>
     </SpaceBetween>

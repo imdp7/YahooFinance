@@ -32,7 +32,7 @@ export function Graph(props) {
     try {
       setLoading("loading");
       const response = await axios.get(
-        `${BASE_URL}interval=${interval}&symbol=${symbol}&range=${range}&useYfid=true&includeAdjustedClose=true${KEY_URL}`
+        `${BASE_URL}interval=${interval}&includePrePost=true&symbol=${symbol}&range=${range}&useYfid=true&includeAdjustedClose=true${KEY_URL}`
       );
       const data = response?.data?.chart?.result[0];
       setGraphData(data);
@@ -53,14 +53,26 @@ export function Graph(props) {
 
   const timestamps = graphData?.timestamp || [];
   const prices = graphData?.indicators?.quote[0]?.close || [];
+  const highs = graphData?.indicators?.quote[0]?.high || [];
+  const lows = graphData?.indicators?.quote[0]?.low || [];
+  const volumes = graphData?.indicators?.quote[0]?.volume || [];
+  const opens = graphData?.indicators?.quote[0]?.open || [];
   const meta = graphData?.meta?.chartPreviousClose;
 
   const seriesData = React.useMemo(() => {
-    // Combine the close and timestamp arrays into a single array of objects
-    return prices.map((close, index) => {
-      return { x: new Date(timestamps[index] * 1000), y: close };
+    // Combine the data arrays into a single array of objects
+    return timestamps.map((timestamp, index) => {
+      return {
+        x: new Date(timestamp * 1000),
+        y: prices[index],
+        high: highs[index],
+        low: lows[index],
+        volume: volumes[index],
+        close: prices[index],
+        open: opens[index],
+      };
     });
-  }, [prices, timestamps]);
+  }, [timestamps, prices, highs, lows, volumes, opens]);
 
   return (
     <SpaceBetween size="s">
@@ -156,10 +168,8 @@ export function Graph(props) {
               .toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
-                day: "numeric",
                 hour: "numeric",
                 minute: "numeric",
-                hour12: !1,
               })
               .split(",")
               .join("\n"),
@@ -178,6 +188,7 @@ export function Graph(props) {
         height={250}
         hideFilter
         hideLegend
+        onRecoveryClick={() => fetchData()}
         xScaleType="time"
         empty={
           <Box textAlign="center" color="inherit">
@@ -274,8 +285,8 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
       }
       label="Default segmented control"
       options={[
-        { text: "Quaterly", id: "seg-1" },
-        { text: "Annually", id: "seg-2" },
+        { text: "Annually", id: "seg-1" },
+        { text: "Quaterly", id: "seg-2" },
       ]}
     />
             </>
@@ -342,6 +353,7 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
         }}
         ariaLabel="Single data series line chart"
         errorText="Error loading data."
+        onRecoveryClick={() => fetchData()}
         height={300}
         loadingText="Loading chart"
         recoveryText="Retry"

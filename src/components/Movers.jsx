@@ -145,7 +145,7 @@ function Movers() {
   const fetchWishlist = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:3000/api/customers/${customer.sub}`
+        `http://127.0.0.1:8087/api/customers/${customer.sub}`
       );
       const data = await response.json();
 
@@ -166,7 +166,7 @@ function Movers() {
   const fetchRecentlyVisited = async () => {
     try {
       const response = await fetch(
-        `http://127.0.0.1:3000/api/customers/${customer.sub}`
+        `http://127.0.0.1:8087/api/customers/${customer.sub}`
       );
       const data = await response.json();
 

@@ -94,7 +94,7 @@ function WatchlistDetail(props) {
       wrapLines: true,
       contentDensity: false,
       stripedRows: true,
-      visibleContent: visibleWatchListColumns,
+      contentDisplay: visibleWatchListColumns,
     });
     const fixedDigit = (str) => str?.toFixed(2);
     return (
@@ -431,14 +431,34 @@ function WatchlistDetail(props) {
                 description:
                   'Select to display content in a denser, more compact mode',
               }}
-              visibleContentPreference={{
-                title: 'Select visible content',
-                options: [
-                  {
-                    label: 'Main distribution properties',
-                    options: watchListPreferences,
-                  },
-                ],
+              contentDisplayPreference={{
+        title: "Column preferences",
+        description:
+          "Customize the columns visibility and order.",
+        liveAnnouncementDndStarted: (position, total) =>
+          `Picked up item at position ${position} of ${total}`,
+        liveAnnouncementDndDiscarded:
+          "Reordering canceled",
+        liveAnnouncementDndItemReordered: (
+          initialPosition,
+          currentPosition,
+          total
+        ) =>
+          initialPosition === currentPosition
+            ? `Moving item back to position ${currentPosition} of ${total}`
+            : `Moving item to position ${currentPosition} of ${total}`,
+        liveAnnouncementDndItemCommitted: (
+          initialPosition,
+          finalPosition,
+          total
+        ) =>
+          initialPosition === finalPosition
+            ? `Item moved back to its original position ${initialPosition} of ${total}`
+            : `Item moved from position ${initialPosition} to position ${finalPosition} of ${total}`,
+        dragHandleAriaDescription:
+          "Use Space or Enter to activate drag for an item, then use the arrow keys to move the item's position. To complete the position move, use Space or Enter, or to discard the move, use Escape.",
+        dragHandleAriaLabel: "Drag handle",
+        options: watchListPreferences,
               }}
             />
           }

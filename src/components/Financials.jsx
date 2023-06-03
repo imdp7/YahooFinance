@@ -31,14 +31,17 @@ const BASE_URL = 'https://yh-finance.p.rapidapi.com/stock/v2/get-financials?';
 const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 
 function Financials({ symbol, loadHelpPanelContent }) {
+  const [loading, setLoading] = React.useState(false);
   const [financials, setFinancials] = useState([]);
   const [statementId, setStatementId] = React.useState('seg-1');
   const [subStatementId, setSubStatementId] = React.useState('sub-1');
   const fetchFinancials = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${BASE_URL}symbol=${symbol}${KEY_URL}`);
       const fin = response?.data;
       setFinancials(fin);
+      setLoading(false);
     } catch (e) {
       console.log(e);
     }
@@ -98,6 +101,7 @@ function Financials({ symbol, loadHelpPanelContent }) {
           columnDefinitions={columnDefinitionsIncome}
           preference={incomePreferences}
           loadHelpPanelContent={loadHelpPanelContent}
+          loading={loading}
         />
       )}
       {statementId == 'seg-1' && subStatementId == 'sub-2' && (
@@ -110,6 +114,7 @@ function Financials({ symbol, loadHelpPanelContent }) {
           columnDefinitions={columnDefinitionsIncome}
           preference={incomePreferences}
           loadHelpPanelContent={loadHelpPanelContent}
+          loading={loading}
         />
       )}
       {statementId == 'seg-2' && subStatementId == 'sub-1' && (
@@ -120,6 +125,7 @@ function Financials({ symbol, loadHelpPanelContent }) {
           columnDefinitions={columnDefinitionsBalanceSheet}
           preference={balanceSheetPreferences}
           loadHelpPanelContent={loadHelpPanelContent}
+          loading={loading}
         />
       )}
       {statementId == 'seg-2' && subStatementId == 'sub-2' && (
@@ -132,6 +138,7 @@ function Financials({ symbol, loadHelpPanelContent }) {
           columnDefinitions={columnDefinitionsBalanceSheet}
           preference={balanceSheetPreferences}
           loadHelpPanelContent={loadHelpPanelContent}
+          loading={loading}
         />
       )}
       {statementId == 'seg-3' && subStatementId == 'sub-2' && (
@@ -144,6 +151,7 @@ function Financials({ symbol, loadHelpPanelContent }) {
           columnDefinitions={columnDefinitionsCashFlow}
           preference={cashFlowPreferences}
           loadHelpPanelContent={loadHelpPanelContent}
+          loading={loading}
         />
       )}
       {statementId == 'seg-3' && subStatementId == 'sub-1' && (
@@ -154,6 +162,7 @@ function Financials({ symbol, loadHelpPanelContent }) {
           columnDefinitions={columnDefinitionsCashFlow}
           preference={cashFlowPreferences}
           loadHelpPanelContent={loadHelpPanelContent}
+          loading={loading}
         />
       )}
     </SpaceBetween>
@@ -166,29 +175,23 @@ const TableIncome = ({
   columnDefinitions,
   preference,
   loadHelpPanelContent,
+  loading
 }) => {
-  const [loading, setLoading] = React.useState(false);
+  
 
   const [preferences, setPreferences] = React.useState({
     wrapLines: true,
-    contentDensity: false,
     stripedRows: true,
-    visibleContent: visibleColumns,
+    contentDensity: false,
+    contentDisplay: visibleColumns,
   });
 
-  React.useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-      return () => clearTimeout(timer);
-    }, 1500);
-  }, []);
   return (
     <Table
       variant="embedded"
       stripedRows={preferences.stripedRows}
       wrapLines={preferences.wrapLines}
-      visibleColumns={preferences.visibleContent}
+      columnDisplay={preferences.visibleColumns}
       contentDensity={preferences.contentDensity}
       loading={loading}
       stickyColumns={{ first: 1, last: 0 }}
@@ -244,15 +247,35 @@ const TableIncome = ({
             description:
               'Select to display content in a denser, more compact mode',
           }}
-          visibleContentPreference={{
-            title: 'Select visible content',
-            options: [
-              {
-                label: 'Main distribution properties',
-                options: preference,
-              },
-            ],
-          }}
+          contentDisplayPreference={{
+        title: "Column preferences",
+        description:
+          "Customize the columns visibility and order.",
+        liveAnnouncementDndStarted: (position, total) =>
+          `Picked up item at position ${position} of ${total}`,
+        liveAnnouncementDndDiscarded:
+          "Reordering canceled",
+        liveAnnouncementDndItemReordered: (
+          initialPosition,
+          currentPosition,
+          total
+        ) =>
+          initialPosition === currentPosition
+            ? `Moving item back to position ${currentPosition} of ${total}`
+            : `Moving item to position ${currentPosition} of ${total}`,
+        liveAnnouncementDndItemCommitted: (
+          initialPosition,
+          finalPosition,
+          total
+        ) =>
+          initialPosition === finalPosition
+            ? `Item moved back to its original position ${initialPosition} of ${total}`
+            : `Item moved from position ${initialPosition} to position ${finalPosition} of ${total}`,
+        dragHandleAriaDescription:
+          "Use Space or Enter to activate drag for an item, then use the arrow keys to move the item's position. To complete the position move, use Space or Enter, or to discard the move, use Escape.",
+        dragHandleAriaLabel: "Drag handle",
+        options: preference,
+      }}
         />
       }
     />
