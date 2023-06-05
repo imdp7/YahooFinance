@@ -70,7 +70,7 @@ const Content = ({ summary, handleModalOpen }) => {
           </Button>
           <Button onClick={() => handleModalOpen(Status, "Exchanges")}>Exchanges</Button>
         </SpaceBetween>
-        <Articles category="generalnews" limit="15"/>
+        <Articles category="generalnews" limit="50"/>
         <SpaceBetween size="m">
           <Movers />
         </SpaceBetween>
