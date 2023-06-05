@@ -26,6 +26,7 @@ const stripe = new Stripe(
   "sk_test_51FrsMEJyECnw5rCL4g5bJkAmDbIWUonjxMQG1h6NDhCaDQ9e29456MxLFFmWRZCf30PZILvtaP0J4FXvHdieWO8e0092YqW109"
 );
 const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubscription }) => {
+  console.log(activeSubscription)
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const statusType = (status) => {
@@ -33,9 +34,11 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
       return <StatusIndicator>{capital(status)}</StatusIndicator>;
     } else if (status === "trialing" || status === "pending") {
       return (
-        <StatusIndicator type="warning">{capital(status)}</StatusIndicator>
+        <StatusIndicator type="warning">{capital("inactive") || capital(status)}</StatusIndicator>
       );
     } else if (status === "stopped") {
+      return <StatusIndicator type="error">{capital(status)}</StatusIndicator>;
+    } else if (status === "past_due") {
       return <StatusIndicator type="error">{capital(status)}</StatusIndicator>;
     }
   };

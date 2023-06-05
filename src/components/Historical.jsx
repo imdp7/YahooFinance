@@ -50,19 +50,19 @@ function Historical(props) {
 
   const fetchHistorical = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `https://yh-finance.p.rapidapi.com/stock/v3/get-historical-data?symbol=${props.symbol}${KEY_URL}`
       );
       const datas = response?.data;
       setHistorical(datas);
+      setLoading(false);
     } catch (e) {
       console.log(e);
     }
   };
   React.useEffect(() => {
-    setLoading(true);
     fetchHistorical();
-    setLoading(false);
   }, [props.symbol]);
 
   function decimal(number) {

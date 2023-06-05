@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState, useEffect } from "react";
 import { Amplify, I18n, Auth } from "aws-amplify";
 import { withAuthenticator, translations } from "@aws-amplify/ui-react";
@@ -7,9 +6,8 @@ import awsExports from "./aws-exports";
 import "./App.css";
 import {
   BrowserRouter as Router,
-  Routes,
   Route,
-  Navigate,
+  Routes
 } from "react-router-dom";
 import axios from "axios";
 import HomePage from "./HomPage";
@@ -59,49 +57,74 @@ const App = ({ user, signOut }) => {
           .then((response) => {
             const subscription = response.data;
 
-            if (subscription && subscription.subscriptionStatus === "success") {
-              setSubscriptionStatus("success");
+            if (subscription && subscription.subscriptionStatus === "active") {
+              setSubscriptionStatus("active");
             } else {
-              setSubscriptionStatus("failure");
+              setSubscriptionStatus("inactive");
+
             }
           })
           .catch((error) => {
             console.error("Error fetching customer:", error);
-            setSubscriptionStatus("failure");
+            setSubscriptionStatus("inactive");
+
           });
       } catch (error) {
+        setSubscriptionStatus("inactive");
         console.error("Error retrieving user attributes:", error);
+
       }
     };
 
     fetchUserAttributes();
-  }, [dispatch,subscriptionStatus]);
+  }, [dispatch]);
 
   return (
     <Router>
       <Routes>
-        {subscriptionStatus === "success" && (
+        {subscriptionStatus === "active" && (
           <>
-            <Route path="/" element={<Home user={user.username} signOut={signOut} />}  />
-            <Route path="/news/:slug" element={<News user={user.username} signOut={signOut} />} />
+            <Route
+              path="/"
+              element={<Home user={user.username} signOut={signOut} />}
+            />
+            <Route
+              path="/news/:slug"
+              element={<News user={user.username} signOut={signOut} />}
+            />
             <Route
               path="/watchlist/:slug"
               element={<WatchlistDetail user={user.username} signOut={signOut} />}
             />
-            <Route path="/stocks/:symbol" element={<Stock user={user.username} signOut={signOut} />} />
-            <Route path="/account" element={<Account user={user.username} signOut={signOut} />} />
+            <Route
+              path="/stocks/:symbol"
+              element={<Stock user={user.username} signOut={signOut} />}
+            />
+            <Route
+              path="/account"
+              element={<Account user={user.username} signOut={signOut} />}
+            />
           </>
         )}
-        {subscriptionStatus === "failure" && (
+        {subscriptionStatus === "inactive" && (
           <>
-            <Route path="/home" element={<HomePage user={user.username} signOut={signOut} />} />
-            <Route path="/checkout" element={<Payment user={user.username} signOut={signOut} />} />
-            <Route path="*" element={<Navigate to="/home" replace />} />
+            <Route
+              path="/"
+              element={<HomePage user={user.username} signOut={signOut} />}
+            />
+            <Route
+              path="/checkout"
+              element={<Payment user={user.username} signOut={signOut} />}
+            />
+            <Route
+              path="/account"
+              element={<Account user={user.username} signOut={signOut} />}
+            />
           </>
         )}
-        {/* <Route path="*" element={<PageNotFound user={user.username} signOut={signOut} />} /> */}
+        <Route path="*" element={<HomePage user={user.username} signOut={signOut} />} />
       </Routes>
-    </Router>  
+    </Router>
   );
 };
 

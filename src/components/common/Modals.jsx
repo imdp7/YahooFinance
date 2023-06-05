@@ -5,7 +5,7 @@ import {
   SpaceBetween,
   Button,
 } from "@cloudscape-design/components";
-function Modals({ visible, setVisible, title,Component }) {
+function Modals({ visible, setVisible, title,Component, symbol }) {
   if(!visible){
     return null;
   }
@@ -15,7 +15,7 @@ function Modals({ visible, setVisible, title,Component }) {
     visible={visible}
     onDismiss={() => setVisible((prevState) => ({ ...prevState, visible: false }))}
     closeAriaLabel="Close modal"
-    size="large"
+    size="max"
     footer={
       <Box float="right">
         <SpaceBetween direction="horizontal" size="m">
@@ -26,7 +26,7 @@ function Modals({ visible, setVisible, title,Component }) {
       </Box>
     }
   >
-    <Component />
+    <Component symbol={symbol} />
   </Modal>
   
   );

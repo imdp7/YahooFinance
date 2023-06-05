@@ -17,7 +17,7 @@ import {
   ColumnLayout,
 } from "@cloudscape-design/components";
 import countryList from "react-select-country-list";
-import { useNavigate } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import Stripe from "stripe";
 
 // write a function to add validation webhook for stripe payments
@@ -27,6 +27,7 @@ const Content = (props) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [visible, setVisible] = useState(false);
   const [type, setType] = useState({ value: "1" });
   const [method, setMethod] = useState(null);
   const [cardNumber, setCardNumber] = useState("");
@@ -52,6 +53,7 @@ const Content = (props) => {
   const [accountNo, setAccountNo] = useState(null);
   const [reAccountNo, setReAccountNo] = useState(null);
   const [accountName, setAccountName] = useState(null);
+  const [successData, setSuccessData] = useState({});
   const [status, setStatus] = useState("");
   const options = useMemo(() => countryList().getData(), []);
   const stripe = new Stripe(
@@ -169,7 +171,6 @@ const Content = (props) => {
           },
         });
       }
-      try {
         const planPrice =
           type === "1" ? SUBSCRIPTION_PRICE_YEARLY : SUBSCRIPTION_PRICE_MONTHLY;
         const customer = await stripe.customers.list({
@@ -179,7 +180,7 @@ const Content = (props) => {
       
         if (customer.data.length > 0) {
           // Customer already exists, do not proceed with payment
-          setErrorMessage("Customer already exists, login to make the payment");
+          setErrorMessage("Customer already exists, login to access premium");
           return false;
         } else {
           try {
@@ -212,30 +213,29 @@ const Content = (props) => {
               days_until_due: 2, //Number of days before invoice is due
             });
             await stripe.invoices.sendInvoice(invoice.id);
-            setStatus("success");
+            setStatus("active");
       
             // Create a subscription object
             const subscriptions = {
               customer: newCustomer,
               subType: subscription,
               invoice: invoice,
-              subscriptionStatus: "success",
+              subscriptionStatus: "active",
             };
       
             // Send the subscription data to the server
-            const response = await fetch("http://127.0.0.1:3000/api/subscribe", {
+            const response = await fetch("http://127.0.0.1:8087/api/subscribe", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ subscriptions }),
             });
-      
+            setSuccessData(subscriptions)
             console.log(response)
             if (response.ok) {
-              alert("Subscription successful");
               // Handle success, such as redirecting to a success page
-              navigate("/");
+              setVisible(true);
             } else {
               alert("Subscription failed");
               // Handle failure, such as displaying an error message
@@ -244,9 +244,6 @@ const Content = (props) => {
             setErrorMessage("Payment failed:", error);
           }
         }
-      } catch (e) {
-        setErrorMessage(e.message);
-      }       
     } catch (error) {
       setErrorMessage(error.message);
       setError(true);
@@ -291,6 +288,7 @@ const Content = (props) => {
       setLoading(false);
     }
   }
+  console.log(successData)
   function focusOnError(ref) {
     if (ref && ref.current) {
       ref.current.focus();
@@ -306,45 +304,58 @@ const Content = (props) => {
   const capital = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
+
+  function convertTimestampToDateString(timestamp) {
+    const date = new Date(timestamp * 1000);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hours = date.getHours().toString().padStart(2, '0');
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+  
+    const dateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return dateString;
+  }
   return (
     <SpaceBetween size="m">
-      {/* <Modal
+      <Modal
         onDismiss={() => setVisible(false)}
         visible={visible}
         closeAriaLabel="Close modal"
         footer={
           <Box float="right">
             <SpaceBetween direction="horizontal" size="xs">
-              <Button variant="primary" onClick={() => navigate(-1)}>
-                Back to Payment preferences
+              <Button variant="primary" onClick={() => navigate('/account')}>
+                View your account
               </Button>
             </SpaceBetween>
           </Box>
         }
-        header={
-          capital(`${confirmationData.funding || confirmationData.type}`) +
-          " " +
-          "card added successfully"
-        }>
+        header={"Congratulations, you have activated the subscription"}>
         <ColumnLayout columns={2}>
-          <FormField label="Card Type">
-            <Box>{capital(`${confirmationData.brand}`)}</Box>
+          <FormField label="Customer Name">
+            <Box>{successData.customer?.name}</Box>
           </FormField>
-          <FormField label="Last 4 digits">
+          <FormField label="Customer Email">
+            <Box>{successData.customer?.email}</Box>
+          </FormField>
+          <FormField label="Subscription ID">
             <Box>
-              {capital(
-                `${
-                  confirmationData?.last4 ||
-                  confirmationData?.us_bank_account?.last4
-                }`
-              )}
+              {successData.subType?.id}
             </Box>
           </FormField>
-          <FormField label="Confirmation Number">
-            <Box>{confirmationData.fingerprint}</Box>
+          <FormField label="Plan type">
+            <Box>{successData.subType?.description}</Box>
+          </FormField>
+          <FormField label="Billing type">
+            <Box>{successData.subType?.plan?.nickname}</Box>
+          </FormField>
+          <FormField label="Trial Period Ends">
+            <Box>{convertTimestampToDateString(successData.subType?.trial_end)}</Box>
           </FormField>
         </ColumnLayout>
-      </Modal> */}
+      </Modal>
       <Grid
         gridDefinition={[
           { colspan: { l: 8, m: 8, default: 12 } },

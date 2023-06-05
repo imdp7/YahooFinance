@@ -11,6 +11,7 @@ import {
 import { AppHeader } from './features/common/TopNavigations';
 import { AppFooter } from './features/common/AppFooter';
 import { useNavigate } from 'react-router-dom';
+import TopNavigations from './components/TopNavigation';
 function NotFound() {
   const navigate = useNavigate();
   return (
@@ -60,7 +61,7 @@ function PageNotFound(props) {
   return (
     <>
       <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
-        <AppHeader {...props} />
+        <TopNavigations {...props} />
       </div>
       <AppLayout
         content={<NotFound />}

@@ -168,6 +168,7 @@ export function Graph(props) {
               .toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
+                day: "numeric",
                 hour: "numeric",
                 minute: "numeric",
               })

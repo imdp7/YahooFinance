@@ -47,7 +47,7 @@ function TopNavigations(props: State): JSX.Element {
   const navigate = useNavigate();
 
   if (redirectURL === "signout") {
-    navigate('/');
+    navigate('/', { replace: true });
     props.signOut();
   } else if (redirectURL === "profile") {
     navigate("/account");

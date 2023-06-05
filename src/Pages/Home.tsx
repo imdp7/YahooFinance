@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import Chart from "../components/common/Chart";
 import Modals from "../components/common/Modals";
 import MarketHolidays from "../components/Holidays";
+import Status from '../components/Status';
 const i18nStrings = {
   overflowMenuTriggerText: "More",
   overflowMenuTitleText: "All",
@@ -67,7 +68,7 @@ const Content = ({ summary, handleModalOpen }) => {
             onClick={() => handleModalOpen(MarketHolidays, "Market Holidays")}>
             Upcoming Holidays
           </Button>
-          <Button>Upcoming Earnings</Button>
+          <Button onClick={() => handleModalOpen(Status, "Exchanges")}>Exchanges</Button>
         </SpaceBetween>
         <Articles category="generalnews" limit="15"/>
         <SpaceBetween size="m">
@@ -123,11 +124,7 @@ function Home(props) {
   return (
     <>
       <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
-        <TopNavigations
-          identity={{ href }}
-          i18nStrings={i18nStrings}
-          {...otherProps}
-        />
+      <TopNavigations user={props.user} signOut={props.signOut} />
       </div>
       <AppLayout
         headerSelector="#h"

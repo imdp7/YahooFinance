@@ -35,7 +35,8 @@ import Insights from "../components/Insights";
 import Options from "../components/Options";
 import Statistics from "../components/Statistics";
 import Sustainability from "../components/Sustainability";
-
+import Dividends from '../components/Dividends';
+import Modals from '../components/common/Modals'
 const i18nStrings = {
   overflowMenuTriggerText: "More",
   overflowMenuTitleText: "All",
@@ -45,7 +46,7 @@ const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 const RECOMMEND_URL =
   "https://yh-finance.p.rapidapi.com/stock/v2/get-recommendations?";
 
-const Content = ({ symbol, loadHelpPanelContent }) => {
+const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const customer = useSelector((state) => state.customer);
@@ -190,7 +191,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await Promise.all([fetchPolygon(), fetchProfile(), fetchRecommend()]);
+        await Promise.all([fetchProfile(), fetchRecommend()]);
 
         const savedSymbols =
           JSON.parse(localStorage.getItem("wishlistSymbols")) || [];
@@ -223,7 +224,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
         console.error("Error fetching data:", error);
       }
     };
-
+    fetchPolygon()
     navigate(`?tabId=${activeTabId}`, { replace: true });
     fetchData();
     addRecentlyVisited(`${symbol}`);
@@ -346,6 +347,7 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
             </SpaceBetween>
           </Header>
         }>
+        <SpaceBetween size="m">
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <SpaceBetween size="xxl" direction="horizontal">
             <SpaceBetween size="s">
@@ -471,6 +473,8 @@ const Content = ({ symbol, loadHelpPanelContent }) => {
             )}
           </div>
         </div>
+        <Button onClick={() => handleModalOpen(Dividends, "Dividends History", symbol)}>Dividends</Button>
+        </SpaceBetween>
       </Container>
       <Tabs
         onChange={({ detail }) => setActiveTabId(detail.activeTabId)}
@@ -619,11 +623,27 @@ function Stock(props) {
     setToolsOpen(true);
   };
 
+  const [modalState, setModalState] = React.useState({
+    visible: false,
+    modalTitle: null,
+    modalComp: null,
+  });
+
   useEffect(() => {
     setTimeout(() => {
       topRef.current.scrollIntoView({ behavior: "smooth" });
     }, 500);
   }, [symbol]);
+
+  const handleModalOpen = (Component, title, symbol) => {
+    setModalState((prevState) => ({
+      ...prevState,
+      modalComp: Component,
+      visible: true,
+      modalTitle: title,
+      symbol: symbol
+    }));
+  };
 
   return (
     <>
@@ -648,10 +668,20 @@ function Stock(props) {
             <Content
               symbol={symbol}
               loadHelpPanelContent={loadHelpPanelContent}
+              handleModalOpen={handleModalOpen}
             />
           </ContentLayout>
         }
       />
+      {modalState.visible && (
+              <Modals
+                visible={modalState.visible}
+                setVisible={setModalState}
+                Component={modalState.modalComp}
+                title={modalState.modalTitle}
+                symbol={modalState.symbol}
+              />
+            )}
     </>
   );
 }

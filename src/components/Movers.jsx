@@ -133,7 +133,6 @@ function Movers() {
       const curr = currencyResponse.data.quoteResponse.result; // Store the gainers response
       const como = commoditiesResponse.data.quoteResponse.result; // Store the losers response
       const world = worldIndicesResponse.data.quoteResponse.result; // Store the active stocks response
-      console.log(curr)
 
       setCurrencies(curr);
       setCommodities(como);
