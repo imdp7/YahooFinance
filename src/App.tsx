@@ -24,6 +24,13 @@ import { addCustomer } from "./app/actions";
 I18n.putVocabularies(translations);
 I18n.setLanguage("en");
 
+// Add default headers for CORS
+axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
+axios.defaults.headers.common["Access-Control-Allow-Methods"] =
+  "GET, POST, PUT, DELETE";
+axios.defaults.headers.common["Access-Control-Allow-Headers"] =
+  "Content-Type, Authorization";
+
 Amplify.configure(awsExports);
 
 const App = ({ user, signOut }) => {
@@ -53,32 +60,34 @@ const App = ({ user, signOut }) => {
         dispatch(addCustomer(customer));
 
         axios
-          .get(`https://rich-blue-chimpanzee-hose.cyclic.app/api/subscribe/q?email=${customer.email}`)
+          .get(
+            `https://rich-blue-chimpanzee-hose.cyclic.app/api/subscribe/q?email=${customer.email}`
+          )
           .then((response) => {
             const subscription = response.data;
 
-            if (subscription && subscription.subscriptionStatus === "active") {
+            if (
+              subscription &&
+              subscription.subscriptionStatus === "active"
+            ) {
               setSubscriptionStatus("active");
             } else {
               setSubscriptionStatus("inactive");
-
             }
           })
           .catch((error) => {
             console.error("Error fetching customer:", error);
             setSubscriptionStatus("inactive");
-
           });
       } catch (error) {
         setSubscriptionStatus("inactive");
         console.error("Error retrieving user attributes:", error);
-
       }
     };
 
     fetchUserAttributes();
   }, [dispatch]);
-
+  console.log(subscriptionStatus);
   return (
     <Router>
       <Routes>
@@ -94,7 +103,9 @@ const App = ({ user, signOut }) => {
             />
             <Route
               path="/watchlist/:slug"
-              element={<WatchlistDetail user={user.username} signOut={signOut} />}
+              element={
+                <WatchlistDetail user={user.username} signOut={signOut} />
+              }
             />
             <Route
               path="/stocks/:symbol"
@@ -122,7 +133,10 @@ const App = ({ user, signOut }) => {
             />
           </>
         )}
-        <Route path="*" element={<HomePage user={user.username} signOut={signOut} />} />
+        <Route
+          path="*"
+          element={<HomePage user={user.username} signOut={signOut} />}
+        />
       </Routes>
     </Router>
   );

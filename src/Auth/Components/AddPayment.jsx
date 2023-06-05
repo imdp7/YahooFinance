@@ -57,7 +57,7 @@ const Content = (props) => {
   const [status, setStatus] = useState("");
   const options = useMemo(() => countryList().getData(), []);
   const stripe = new Stripe(
-    "sk_test_51FrsMEJyECnw5rCL4g5bJkAmDbIWUonjxMQG1h6NDhCaDQ9e29456MxLFFmWRZCf30PZILvtaP0J4FXvHdieWO8e0092YqW109"
+    "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"
   );
   const [showModal, setShowModal] = useState(false);
   const [dirty, setDirty] = useState(false);
