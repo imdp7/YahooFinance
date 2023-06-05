@@ -18,7 +18,7 @@ function Dividends({symbol}) {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://api.polygon.io/v3/reference/dividends?ticker=${symbol}&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`
+          `https://api.polygon.io/v3/reference/dividends?ticker=${symbol}&apiKey=${polygon}`
         );
         const s = response?.data?.results;
         setStatus(s);

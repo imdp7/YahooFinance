@@ -8,6 +8,7 @@ import {
   Button,
   SpaceBetween,
 } from "@cloudscape-design/components";
+import { polygon} from '../../api';
 function Status() {
   const [loading, setLoading] = React.useState(false);
   const [status, setStatus] = React.useState([]);
@@ -18,7 +19,7 @@ function Status() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `https://api.polygon.io/v3/reference/exchanges?locale=${locale}&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`
+          `https://api.polygon.io/v3/reference/exchanges?locale=${locale}&apiKey=${polygon}`
         );
         const s = response?.data?.results;
         setStatus(s);

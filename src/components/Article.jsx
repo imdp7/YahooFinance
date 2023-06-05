@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { host } from '../../api';
+import { host, polygon} from '../../api';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -27,7 +27,7 @@ function Article(props) {
 
   const fetchNews = async () => {
     try {
-      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${props.category}&limit=15&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`);
+      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${props.category}&limit=15&apiKey=${polygon}`);
       const data = res.data?.results;
       setNews(data);
     } catch (error) {
@@ -52,7 +52,7 @@ function Article(props) {
               ]}
             >
               <img
-                src={`${n?.image_url}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`}
+                src={`${n?.image_url}?apiKey=${polygon}`}
                 style={{ maxWidth: '100%' }}
                 alt={n?.article_url}
                 className="article-image"

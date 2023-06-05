@@ -1,6 +1,7 @@
 import React from "react";
 import axios from 'axios'
 import {Table, Box} from '@cloudscape-design/components'
+import { polygon} from '../../api';
 function MarketHolidays() {
   const [loading, setLoading] = React.useState(false);
   const [holidays, setHolidays] = React.useState([]);
@@ -10,7 +11,7 @@ function MarketHolidays() {
       try {
         setLoading(true)
         const response = await axios.get(
-          "https://api.polygon.io/v1/marketstatus/upcoming?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE"
+          `https://api.polygon.io/v1/marketstatus/upcoming?apiKey=${polygon}`
         );
         const sum = response?.data;
         setHolidays(sum);

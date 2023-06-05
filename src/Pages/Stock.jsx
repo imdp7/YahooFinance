@@ -22,7 +22,7 @@ import {
   addToRecentlyVisited,
 } from "../app/actions";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { key, host } from "../../api";
+import { key, host, polygon } from "../../api";
 import axios from "axios";
 import { InfoLink, HelpPanels } from "../components/common/InfoLink";
 import Summary from "../components/Summary";
@@ -59,7 +59,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   const fetchPolygon = async () => {
     try {
       const res = await axios.get(
-        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`
+        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=${polygon}`
       );
       const data = res.data.results;
       setPolygon(data);
@@ -294,7 +294,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
               <div>
               {polygon?.branding?.logo_url && (
                 <img
-                  src={`${polygon?.branding?.logo_url}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`}
+                  src={`${polygon?.branding?.logo_url}?apiKey=${polygon}`}
                   height="50"
                   width="100"
                 />
@@ -335,7 +335,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
             <div>
             {polygon?.branding?.icon_url && (
               <img
-                src={`${polygon?.branding?.icon_url}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`}
+                src={`${polygon?.branding?.icon_url}?apiKey=${polygon}`}
                 height="50"
                 width="50"
               />

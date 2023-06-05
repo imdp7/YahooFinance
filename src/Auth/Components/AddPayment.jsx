@@ -17,8 +17,9 @@ import {
   ColumnLayout,
 } from "@cloudscape-design/components";
 import countryList from "react-select-country-list";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Stripe from "stripe";
+import { stripeKey } from "../../../api";
 
 // write a function to add validation webhook for stripe payments
 
@@ -56,9 +57,7 @@ const Content = (props) => {
   const [successData, setSuccessData] = useState({});
   const [status, setStatus] = useState("");
   const options = useMemo(() => countryList().getData(), []);
-  const stripe = new Stripe(
-    "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"
-  );
+  const stripe = new Stripe(stripeKey);
   const [showModal, setShowModal] = useState(false);
   const [dirty, setDirty] = useState(false);
   const methodRef = useRef(null);
@@ -171,79 +170,82 @@ const Content = (props) => {
           },
         });
       }
-        const planPrice =
-          type === "1" ? SUBSCRIPTION_PRICE_YEARLY : SUBSCRIPTION_PRICE_MONTHLY;
-        const customer = await stripe.customers.list({
-          email: email,
-          limit: 1,
-        });
-      
-        if (customer.data.length > 0) {
-          // Customer already exists, do not proceed with payment
-          setErrorMessage("Customer already exists, login to access premium");
-          return false;
-        } else {
-          try {
-            // Customer does not exist, proceed with payment
-            // Create a new customer
-            const newCustomer = await stripe.customers.create({
-              email: email,
-              name: name,
-              payment_method: paymentMethod.id,
-              invoice_settings: {
-                default_payment_method: paymentMethod.id,
+      const planPrice =
+        type === "1" ? SUBSCRIPTION_PRICE_YEARLY : SUBSCRIPTION_PRICE_MONTHLY;
+      const customer = await stripe.customers.list({
+        email: email,
+        limit: 1,
+      });
+
+      if (customer.data.length > 0) {
+        // Customer already exists, do not proceed with payment
+        setErrorMessage("Customer already exists, login to access premium");
+        return false;
+      } else {
+        try {
+          // Customer does not exist, proceed with payment
+          // Create a new customer
+          const newCustomer = await stripe.customers.create({
+            email: email,
+            name: name,
+            payment_method: paymentMethod.id,
+            invoice_settings: {
+              default_payment_method: paymentMethod.id,
+            },
+          });
+          const subscription = await stripe.subscriptions.create({
+            customer: newCustomer.id,
+            description: `Plan - ${type}`,
+            trial_period_days: 14,
+            items: [
+              {
+                price: planPrice,
               },
-            });
-            const subscription = await stripe.subscriptions.create({
-              customer: newCustomer.id,
-              description: `Plan - ${type}`,
-              trial_period_days: 14,
-              items: [
-                {
-                  price: planPrice,
-                },
-              ],
-            });
-      
-            // Send invoices and receipt to the customer
-            const invoice = await stripe.invoices.create({
-              customer: newCustomer.id,
-              subscription: subscription.id,
-              collection_method: "send_invoice",
-              days_until_due: 2, //Number of days before invoice is due
-            });
-            await stripe.invoices.sendInvoice(invoice.id);
-            setStatus("active");
-      
-            // Create a subscription object
-            const subscriptions = {
-              customer: newCustomer,
-              subType: subscription,
-              invoice: invoice,
-              subscriptionStatus: "active",
-            };
-      
-            // Send the subscription data to the server
-            const response = await fetch("https://rich-blue-chimpanzee-hose.cyclic.app/api/subscribe", {
+            ],
+          });
+
+          // Send invoices and receipt to the customer
+          const invoice = await stripe.invoices.create({
+            customer: newCustomer.id,
+            subscription: subscription.id,
+            collection_method: "send_invoice",
+            days_until_due: 2, //Number of days before invoice is due
+          });
+          await stripe.invoices.sendInvoice(invoice.id);
+          setStatus("active");
+
+          // Create a subscription object
+          const subscriptions = {
+            customer: newCustomer,
+            subType: subscription,
+            invoice: invoice,
+            subscriptionStatus: "active",
+          };
+
+          // Send the subscription data to the server
+          const response = await fetch(
+            "https://rich-blue-chimpanzee-hose.cyclic.app/api/subscribe",
+            {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ subscriptions }),
-            });
-            setSuccessData(subscriptions)
-            console.log(response)
-            if (response.ok) {
-              // Handle success, such as redirecting to a success page
-              setVisible(true);
-            } else {
-              alert("Subscription failed");
-              // Handle failure, such as displaying an error message
             }
-          } catch (error) {
-            setErrorMessage("Payment failed:", error);
+          );
+          setSuccessData(subscriptions);
+          console.log(response);
+          if (response.ok) {
+            // Handle success, such as redirecting to a success page
+            setVisible(true);
+          } else {
+            alert("Subscription failed");
+            // Handle failure, such as displaying an error message
           }
+        } catch (error) {
+          setErrorMessage("Payment failed:", error);
         }
+      }
     } catch (error) {
       setErrorMessage(error.message);
       setError(true);
@@ -288,7 +290,7 @@ const Content = (props) => {
       setLoading(false);
     }
   }
-  console.log(successData)
+  console.log(successData);
   function focusOnError(ref) {
     if (ref && ref.current) {
       ref.current.focus();
@@ -308,12 +310,12 @@ const Content = (props) => {
   function convertTimestampToDateString(timestamp) {
     const date = new Date(timestamp * 1000);
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-  
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+
     const dateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     return dateString;
   }
@@ -326,7 +328,7 @@ const Content = (props) => {
         footer={
           <Box float="right">
             <SpaceBetween direction="horizontal" size="xs">
-              <Button variant="primary" onClick={() => navigate('/account')}>
+              <Button variant="primary" onClick={() => navigate("/account")}>
                 View your account
               </Button>
             </SpaceBetween>
@@ -341,9 +343,7 @@ const Content = (props) => {
             <Box>{successData.customer?.email}</Box>
           </FormField>
           <FormField label="Subscription ID">
-            <Box>
-              {successData.subType?.id}
-            </Box>
+            <Box>{successData.subType?.id}</Box>
           </FormField>
           <FormField label="Plan type">
             <Box>{successData.subType?.description}</Box>
@@ -352,7 +352,9 @@ const Content = (props) => {
             <Box>{successData.subType?.plan?.nickname}</Box>
           </FormField>
           <FormField label="Trial Period Ends">
-            <Box>{convertTimestampToDateString(successData.subType?.trial_end)}</Box>
+            <Box>
+              {convertTimestampToDateString(successData.subType?.trial_end)}
+            </Box>
           </FormField>
         </ColumnLayout>
       </Modal>
@@ -1072,7 +1074,9 @@ const Content = (props) => {
                         justifyContent: "space-between",
                       }}>
                       <Box fontSize="heading-s" fontWeight="bold">
-                      {type == "1" ? "Annual subscription fee:" : "Monthly subscription fee:"}
+                        {type == "1"
+                          ? "Annual subscription fee:"
+                          : "Monthly subscription fee:"}
                       </Box>
                       <Box fontSize="heading-s" fontWeight="bold">
                         {type == "1" ? "$350.00" : "$35.00"}

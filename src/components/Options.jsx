@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { key, host } from "../../api";
+import { key, host , polygon} from "../../api";
 
 import { convertUnixTimestamp } from "./Historical";
 import {
@@ -24,7 +24,7 @@ function Options(props) {
     try {
       setLoading(true);
       const response = await axios.get(
-        `https://api.polygon.io/v3/reference/options/contracts?underlying_ticker=${props.symbol}&contract_type=${type}&limit=1000&order=asc&sort=expiration_date&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`
+        `https://api.polygon.io/v3/reference/options/contracts?underlying_ticker=${props.symbol}&contract_type=${type}&limit=1000&order=asc&sort=expiration_date&apiKey=${polygon}`
       );
       const datas = response?.data?.results;
       // Extract expiration dates from options and set as options for Select component

@@ -16,17 +16,20 @@ import {
   ExpandableSection,
   Button,
 } from "@cloudscape-design/components";
+import { stripeKey } from "../../../api";
 import { appLayoutLabels } from "../../features/common/labels";
 import { AppFooter } from "../../features/common/AppFooter";
-import CommonHeader from "../../components/common/CommonHeader";
 import Stripe from "stripe";
 import TopNavigations from "../../components/TopNavigation";
 
-const stripe = new Stripe(
-  "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"
-);
-const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubscription }) => {
-  console.log(activeSubscription)
+const stripe = new Stripe(stripeKey);
+const Content = ({
+  activeSubscription,
+  invoices,
+  cancelSubscription,
+  resumeSubscription,
+}) => {
+  console.log(activeSubscription);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const statusType = (status) => {
@@ -34,7 +37,9 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
       return <StatusIndicator>{capital(status)}</StatusIndicator>;
     } else if (status === "trialing" || status === "pending") {
       return (
-        <StatusIndicator type="warning">{capital("inactive") || capital(status)}</StatusIndicator>
+        <StatusIndicator type="warning">
+          {capital("inactive") || capital(status)}
+        </StatusIndicator>
       );
     } else if (status === "stopped") {
       return <StatusIndicator type="error">{capital(status)}</StatusIndicator>;
@@ -83,7 +88,7 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
     <SpaceBetween size="m">
       <Container header={<Header variant="h2">Subscriptions</Header>}>
         <SpaceBetween size="m">
-          {activeSubscription && !activeSubscription[0]?.canceled_at  ? (
+          {activeSubscription && !activeSubscription[0]?.canceled_at ? (
             <SpaceBetween size="m">
               {activeSubscription.map((active) => (
                 <ExpandableSection
@@ -136,7 +141,10 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
                         <Button onClick={onNavigate} loading={loading}>
                           Pause Active Subscription
                         </Button>
-                        <Button onClick={onNavigate} variant="primary" loading={loading}>
+                        <Button
+                          onClick={onNavigate}
+                          variant="primary"
+                          loading={loading}>
                           Cancel Active Subscription
                         </Button>
                       </SpaceBetween>
@@ -154,25 +162,26 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
             </ColumnLayout>
           )}
           <ExpandableSection headerText="View Cancelled Subscriptions">
-         {activeSubscription && activeSubscription[0]?.canceled_at ? (
-          <SpaceBetween size="m">
-            {activeSubscription.map((active) => (
-              <ColumnLayout columns={2} key={active.id}>
-              <FormField label="Subscription ID">
-              <Box>{active.id}</Box>
-              </FormField>
-              <Box float="right">
-                        <Button onClick={onNavigate} variant="primary">
-                           Resume Subscription
-                        </Button>
+            {activeSubscription && activeSubscription[0]?.canceled_at ? (
+              <SpaceBetween size="m">
+                {activeSubscription.map((active) => (
+                  <ColumnLayout columns={2} key={active.id}>
+                    <FormField label="Subscription ID">
+                      <Box>{active.id}</Box>
+                    </FormField>
+                    <Box float="right">
+                      <Button onClick={onNavigate} variant="primary">
+                        Resume Subscription
+                      </Button>
                     </Box>
-              </ColumnLayout>
-            ))}
-            </SpaceBetween>
-         )
-           : (
-            <Box fontSize="heading-s">You don't have cancelled subscriptions</Box> 
-          )}
+                  </ColumnLayout>
+                ))}
+              </SpaceBetween>
+            ) : (
+              <Box fontSize="heading-s">
+                You don't have cancelled subscriptions
+              </Box>
+            )}
           </ExpandableSection>
         </SpaceBetween>
       </Container>
@@ -244,8 +253,7 @@ const Content = ({ activeSubscription, invoices, cancelSubscription, resumeSubsc
               <Button
                 variant="primary"
                 onClick={handleCancelSubscription}
-                loading={loading}
-                >
+                loading={loading}>
                 Cancel Subscription
               </Button>
             </SpaceBetween>
@@ -289,7 +297,7 @@ function Account(props) {
         const fetchSubscriptions = async (customerId) => {
           const subscriptions = await stripe.subscriptions.list({
             customer: customerId,
-            status:'all'
+            status: "all",
           });
           return subscriptions.data;
         };
