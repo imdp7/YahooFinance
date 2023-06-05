@@ -157,7 +157,7 @@ function Home(props) {
                     {
                       label: "News",
                       id: "news",
-                      content: <Articles category={"generalnews"} limit="15" />,
+                      content: <Articles category={"generalnews"} limit="50" />,
                     },
                   ]}
                 />
