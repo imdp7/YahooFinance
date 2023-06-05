@@ -87,7 +87,7 @@ const App = ({ user, signOut }) => {
 
     fetchUserAttributes();
   }, [dispatch]);
-  console.log(subscriptionStatus);
+  
   return (
     <Router>
       <Routes>

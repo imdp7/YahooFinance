@@ -9,7 +9,7 @@ import {
   Icon,
   Button,
   Box,
-  Link,
+  Flashbar,
   Tabs,
   FormField,
 } from "@cloudscape-design/components";
@@ -46,7 +46,7 @@ const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 const RECOMMEND_URL =
   "https://yh-finance.p.rapidapi.com/stock/v2/get-recommendations?";
 
-const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
+const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange, setItems, setLoadings}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const customer = useSelector((state) => state.customer);
@@ -55,6 +55,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   const [recommend, setRecommend] = useState([]);
   const [activeTabId, setActiveTabId] = useState("summary");
   const [loading, setLoading] = useState(false);
+
 
   const fetchPolygon = async () => {
     try {
@@ -102,8 +103,19 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   };
 
   const addItemToWishlist = (symbol) => {
+    let success = true; // Declare success variable outside the fetch block
+  
+    const newItem = {
+      type: success ? "success" : "error",
+      content: success ? "Item added to wishlist" : "Failed to add item to wishlist",
+      dismissible: true,
+      dismissLabel: "Dismiss message",
+      onDismiss: () => setItems([]),
+      id: `message_${Date.now()}`,
+    };
+  
     dispatch(addToWishlist(symbol));
-    // Make API request to add the symbol to the wishlist
+  
     fetch(`https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
@@ -119,18 +131,29 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        // Update the wishlist in the Redux store with the updated data
         if (Array.isArray(data.wishlist.symbols)) {
-          // Check if data.wishlist.symbols is an array
           dispatch(setWishlistSymbols(data.wishlist.symbols));
+          success = true; // Update the success value based on the API request result
+          onItemsChange([newItem]); // Update with an array containing newItem
         }
+        setLoadings(false); // Set loading to false after successful API request
+
       })
       .catch((error) => {
         console.error("Error adding item to wishlist:", error);
       });
-  };
+  }; 
 
   const removeItemFromWishlist = (symbol) => {
+    let success = true; // Declare success variable outside the fetch block
+    const newItem = {
+      type: success ? "success" : "error",
+      content: success ? "Item removed from wishlist" : "Failed to remove item from wishlist",
+      dismissible: true,
+      dismissLabel: "Dismiss message",
+      onDismiss: () => setItems([]),
+      id: `message_${Date.now()}`,
+    };
     dispatch(removeFromWishlist(symbol));
     // Make API request to remove the symbol from the wishlist
     fetch(`https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`, {
@@ -151,8 +174,12 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
         // Update the wishlist in the Redux store with the updated data
         if (Array.isArray(data.wishlist.symbols)) {
           // Check if data.wishlist.symbols is an array
-          dispatch(setWishlist(data.wishlist.symbols));
+          dispatch(setWishlistSymbols(data.wishlist.symbols));
+          success = true; // Set the value based on the success of the API request
+          onItemsChange([newItem]); // Update with an array containing newItem
         }
+        setLoadings(false); // Set loading to false after successful API request
+
       })
       .catch((error) => {
         console.error("Error removing item from wishlist:", error);
@@ -614,6 +641,9 @@ function Stock(props) {
   const [tools, setTools] = useState();
   const [toolsOpen, setToolsOpen] = useState(false);
   const [toolsContent, setToolsContent] = useState();
+  const [items, setItems] = React.useState([]);
+  const [loadings, setLoadings] = React.useState(true);
+
   const loadHelpPanelContent = (toolsContent) => {
     setToolsOpen(true);
     setToolsContent(toolsContent);
@@ -644,6 +674,9 @@ function Stock(props) {
       symbol: symbol
     }));
   };
+  const onItemsChange = (newItems) => {
+    setItems(newItems);
+  };
 
   return (
     <>
@@ -662,13 +695,16 @@ function Stock(props) {
         tools={toolsContent}
         navigationHide={true}
         onToolsChange={({ detail }) => setToolsOpen(detail.open)}
-        // toolsHide={true}
+        notifications={<Flashbar       items={loadings ? [{ type: "success", content: "Adding item to wishlist...", loading: {loadings}, }] : items} />}
         content={
           <ContentLayout header={<Header variant="h3" />}>
             <Content
               symbol={symbol}
               loadHelpPanelContent={loadHelpPanelContent}
               handleModalOpen={handleModalOpen}
+              onItemsChange={onItemsChange}
+              setItems={setItems}
+              setLoadings={setLoadings}
             />
           </ContentLayout>
         }
