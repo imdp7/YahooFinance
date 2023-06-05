@@ -224,7 +224,7 @@ const Content = (props) => {
             };
       
             // Send the subscription data to the server
-            const response = await fetch("http://127.0.0.1:8087/api/subscribe", {
+            const response = await fetch("https://rich-blue-chimpanzee-hose.cyclic.app/api/subscribe", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

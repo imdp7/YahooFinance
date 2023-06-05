@@ -53,7 +53,7 @@ const App = ({ user, signOut }) => {
         dispatch(addCustomer(customer));
 
         axios
-          .get(`http://localhost:8087/api/subscribe/q?email=${customer.email}`)
+          .get(`https://rich-blue-chimpanzee-hose.cyclic.app/api/subscribe/q?email=${customer.email}`)
           .then((response) => {
             const subscription = response.data;
 

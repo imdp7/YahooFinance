@@ -104,7 +104,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   const addItemToWishlist = (symbol) => {
     dispatch(addToWishlist(symbol));
     // Make API request to add the symbol to the wishlist
-    fetch(`http://127.0.0.1:8087/api/customers/${customer.sub}`, {
+    fetch(`https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -133,7 +133,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   const removeItemFromWishlist = (symbol) => {
     dispatch(removeFromWishlist(symbol));
     // Make API request to remove the symbol from the wishlist
-    fetch(`http://127.0.0.1:8087/api/customers/${customer.sub}`, {
+    fetch(`https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -162,7 +162,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
   const addRecentlyVisited = (symbol) => {
     dispatch(addToRecentlyVisited(symbol));
     // Make API request to remove the symbol from the wishlist
-    fetch(`http://127.0.0.1:8087/api/customers/${customer.sub}`, {
+    fetch(`https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -202,7 +202,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
           dispatch(setWishlistSymbols(savedSymbols));
         } else {
           const response = await fetch(
-            `http://127.0.0.1:8087/api/customers/${customer.sub}`
+            `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
           );
           const data = await response.json();
           if (Array.isArray(data.wishlist.symbols)) {
@@ -213,7 +213,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen}) => {
           dispatch(addToRecentlyVisited(recentSymbols));
         } else {
           const response = await fetch(
-            `http://127.0.0.1:8087/api/customers/${customer.sub}`
+            `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
           );
           const data = await response.json();
           if (Array.isArray(data.recentlyVisited.symbols)) {
