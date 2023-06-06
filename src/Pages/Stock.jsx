@@ -46,7 +46,7 @@ const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 const RECOMMEND_URL =
   "https://yh-finance.p.rapidapi.com/stock/v2/get-recommendations?";
 
-const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange, setItems, setLoadings}) => {
+const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange, setItems, setLoadings, loadings}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const customer = useSelector((state) => state.customer);
@@ -104,7 +104,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
 
   const addItemToWishlist = (symbol) => {
     let success = true; // Declare success variable outside the fetch block
-  
+    setLoadings(true)
     const newItem = {
       type: success ? "success" : "error",
       content: success ? "Item added to wishlist" : "Failed to add item to wishlist",
@@ -146,6 +146,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
 
   const removeItemFromWishlist = (symbol) => {
     let success = true; // Declare success variable outside the fetch block
+    setLoadings(true) 
     const newItem = {
       type: success ? "success" : "error",
       content: success ? "Item removed from wishlist" : "Failed to remove item from wishlist",
@@ -334,7 +335,8 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
                       <Button
                         iconName="heart"
                         iconAlt="watchlist"
-                        onClick={() => removeItemFromWishlist(`${symbol}`)}>
+                        onClick={() => removeItemFromWishlist(`${symbol}`)}
+                        loading={loadings}>
                         Remove from watchlist
                       </Button>
                     </>
@@ -344,7 +346,8 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
                         iconName="heart"
                         iconAlt="watchlist"
                         variant="primary"
-                        onClick={() => addItemToWishlist(`${symbol}`)}>
+                        onClick={() => addItemToWishlist(`${symbol}`)}
+                        loading={loadings}>
                         Add to watchlist
                       </Button>
                     </>
@@ -642,7 +645,7 @@ function Stock(props) {
   const [toolsOpen, setToolsOpen] = useState(false);
   const [toolsContent, setToolsContent] = useState();
   const [items, setItems] = React.useState([]);
-  const [loadings, setLoadings] = React.useState(true);
+  const [loadings, setLoadings] = React.useState(false);
 
   const loadHelpPanelContent = (toolsContent) => {
     setToolsOpen(true);
@@ -695,7 +698,7 @@ function Stock(props) {
         tools={toolsContent}
         navigationHide={true}
         onToolsChange={({ detail }) => setToolsOpen(detail.open)}
-        notifications={<Flashbar       items={loadings ? [{ type: "success", content: "Adding item to wishlist...", loading: {loadings}, }] : items} />}
+        notifications={<Flashbar       items={loadings ? [{ type: "success", content: "Pending Operation...", loading: {loadings}, }] : items} />}
         content={
           <ContentLayout header={<Header variant="h3" />}>
             <Content
@@ -705,6 +708,7 @@ function Stock(props) {
               onItemsChange={onItemsChange}
               setItems={setItems}
               setLoadings={setLoadings}
+              loadings={loadings}
             />
           </ContentLayout>
         }
