@@ -314,13 +314,12 @@ const xTitle = selectedId === 'annually' ? "Annually" : 'Quarterly';
         }}
         ariaLabel="Single data series line chart"
         errorText="Error loading data."
-        onRecoveryClick={() => fetchData()}
         height={300}
         loadingText="Loading chart"
         recoveryText="Retry"
         statusType={loadings}
         xScaleType="categorical"
-        onRecoveryClick={fetchEarnings}
+        onRecoveryClick={() => fetchEarnings()}
         yTitle="Revenue (USD)"
         xTitle={xTitle}
         empty={
