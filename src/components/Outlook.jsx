@@ -29,8 +29,10 @@ function Outlook(props) {
   };
   React.useEffect(() => {
     fetchOutlook();
-  }, []);
+  }, [outlook]);
   return (
+    <div>
+    {outlook && (
     <Container
       header={
         <Header
@@ -78,6 +80,8 @@ function Outlook(props) {
         </SpaceBetween>
       </SpaceBetween>
     </Container>
+    )}
+    </div>
   );
 }
 

@@ -10,45 +10,16 @@ import {
   Link,
   SegmentedControl,
 } from "@cloudscape-design/components";
-import axios from "axios";
-import { key, host } from "../../api";
 import { InfoLink, HelpPanels } from "../components/common/InfoLink";
-const BASE_URL = "https://yh-finance.p.rapidapi.com/stock/v3/get-chart?";
-const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 
-export function Graph(props) {
-  const {
-    summary = props?.profile?.summaryDetail,
-    earnings = props?.profile?.earnings,
-    profile = props.profile,
-    symbol = props.symbol,
-  } = props;
-  const [loading, setLoading] = React.useState("finished");
-  const [graphData, setGraphData] = React.useState([]);
-  const [range, setRange] = React.useState("1d"); // Track the selected range
-  const [interval, setInterval] = React.useState("15m");
 
-  const fetchData = async () => {
-    try {
-      setLoading("loading");
-      const response = await axios.get(
-        `${BASE_URL}interval=${interval}&includePrePost=true&symbol=${symbol}&range=${range}&useYfid=true&includeAdjustedClose=true${KEY_URL}`
-      );
-      const data = response?.data?.chart?.result[0];
-      setGraphData(data);
-      setLoading("finished");
-    } catch (e) {
-      console.log(e);
-      setLoading("error");
-    }
-  };
-  React.useEffect(() => {
-    fetchData();
-  }, [range, interval]);
+export function Graph({graphData, loadings, fetchChart, setInterval, setRange, range}) {
 
   const handleRangeClick = (selectedRange, selectedInterval) => {
     setRange(selectedRange);
     setInterval(selectedInterval);
+    fetchChart(); // Call fetchChart to update the chart data
+
   };
 
   const timestamps = graphData?.timestamp || [];
@@ -121,7 +92,7 @@ export function Graph(props) {
         <Button iconName="expand" variant="icon" />
       </SpaceBetween>
       <AreaChart
-        statusType={loading}
+        statusType={loadings}
         errorText="Error loading data."
         loadingText="Loading chart"
         recoveryText="Retry"
@@ -189,7 +160,7 @@ export function Graph(props) {
         height={250}
         hideFilter
         hideLegend
-        onRecoveryClick={() => fetchData()}
+        onRecoveryClick={() => fetchChart()}
         xScaleType="time"
         empty={
           <Box textAlign="center" color="inherit">
@@ -204,47 +175,30 @@ export function Graph(props) {
   );
 }
 
-export function BarGraph({ loadHelpPanelContent, symbol }) {
-
-  const options = {
-    method: 'GET',
-    url: 'https://yh-finance.p.rapidapi.com/stock/get-earnings',
-    params: {
-      symbol: symbol,
-      region: 'US',
-      lang: 'en-US'
-    },
-    headers: {
-      'X-RapidAPI-Key': '53858f6f17msh56f101adaa014e6p175338jsn02a3e984b0ee',
-      'X-RapidAPI-Host': 'yh-finance.p.rapidapi.com'
-    }
-  };
+export function BarGraph({ loadHelpPanelContent, earning, loadings, fetchEarnings }) {
 
   const [selectedId, setSelectedId] = React.useState(
-    "seg-1"
+    "annually"
   );
-  const [loading, setLoading] = React.useState("finished");
-  const [result, setResult] = React.useState([]);
 
-  const fetchData = async () => {
-    try {
-      setLoading("loading");
-      const response = await axios.request(options);
-      const data = response?.data?.quoteSummary?.result[0]?.earnings;
-      setResult(data);
-      console.log(result)
-      setLoading("finished");
-    } catch (e) {
-      console.log(e);
-      setLoading("error");
-    }
-  };
-  React.useEffect(() => {
-    fetchData();
-  }, [symbol]);
+  const earnings = selectedId === 'annually' ? earning?.financialsChart?.yearly : earning?.financialsChart?.quarterly;
 
-  const earnings = result?.financialsChart?.quarterly || [];
-  const quaterlyRevenue = earnings.map((item) => {
+  const annualRevenue = earning?.financialsChart?.yearly?.map((item) => {
+    const year = item.date.toString().match(/\d{4}/)?.[0]
+    return {
+      x: new Date(year),
+      y: item.revenue.raw,
+    };
+  });
+  const annualEarnings = earning?.financialsChart?.yearly?.map((item) => {
+    const year = item.date.toString().match(/\d{4}/)?.[0]
+    return {
+      x: new Date(year),
+      y: item.earnings.raw,
+    };
+  });
+
+  const quarterlyRevenue = earning?.financialsChart?.quarterly?.map((item) => {
     const dateStr = item.date;
     const quarter = dateStr.match(/\d+/)[0];
     const year = dateStr.match(/\d{4}/)[0];
@@ -254,7 +208,7 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
       y: item.revenue.raw,
     };
   });
-  const quaterlyEarnings = earnings.map((item) => {
+  const quarterlyEarnings = earning?.financialsChart?.quarterly?.map((item) => {
     const dateStr = item.date;
     const quarter = dateStr.match(/\d+/)[0];
     const year = dateStr.match(/\d{4}/)[0];
@@ -266,12 +220,19 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
   });
 
      // Find the highest and lowest revenue and earnings values
-  const revenueValues = earnings.map((item) => item.revenue.raw);
-  const earningsValues = earnings.map((item) => item.earnings.raw);
+  const revenueValues = selectedId === 'annually' ? (annualRevenue ?? []).map(item => item.y) : (quarterlyRevenue ?? []).map(item => item.y);
+  const earningsValues = selectedId === 'annually' ? (annualEarnings ?? []).map(item => item.y) : (quarterlyEarnings ?? []).map(item => item.y);
   const highestValue = Math.max(...revenueValues, ...earningsValues);
   const lowestValue = Math.min(...revenueValues, ...earningsValues);
+  
+  const xDomain = selectedId === 'annually'
+  ? (annualRevenue ?? []).map((item) => item.x)
+  : (quarterlyRevenue ?? []).map((item) => item.x);
 
-  const xDomain = quaterlyRevenue.map((item) => item.x);
+const earningsData = selectedId === 'annually' ? (annualEarnings ?? []) : (quarterlyEarnings ?? []);
+const revenueData = selectedId === 'annually' ? (annualRevenue ?? []) : (quarterlyRevenue ?? []);
+
+const xTitle = selectedId === 'annually' ? "Annually" : 'Quarterly';
   return (
     <Container
       header={
@@ -286,8 +247,8 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
       }
       label="Default segmented control"
       options={[
-        { text: "Annually", id: "seg-1" },
-        { text: "Quaterly", id: "seg-2" },
+        { text: "Annually", id: "annually" },
+        { text: "Quaterly", id: "quarterly" },
       ]}
     />
             </>
@@ -297,7 +258,7 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
               onFollow={() =>
                 loadHelpPanelContent(
                   <HelpPanels
-                    title="Trend"
+                    title="Financials"
                     des="View the latest announcement for the AWS services you're using. Learn about new capabilities that you can use to experiment and innovate. These announcements are personalized to your account."
                   />
                 )
@@ -308,23 +269,22 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
         </Header>
       }>
       <BarChart
-        series={[
+       series={[
           {
             title: "Revenue",
             type: "bar",
-            data: quaterlyRevenue,
+            data: revenueData,
             valueFormatter: (e) => "$" + e.toLocaleString("en-US"),
           },
           {
             title: "Earnings",
             type: "bar",
-            data: quaterlyEarnings,
+            data: earningsData,
             valueFormatter: (e) => "$" + e.toLocaleString("en-US"),
           },
-          
         ]}
-        xDomain={xDomain}
-        yDomain={[lowestValue, highestValue]}
+        xDomain={xDomain || []}
+        yDomain={[lowestValue, highestValue] || []}
         i18nStrings={{
           filterLabel: "Filter displayed data",
           filterPlaceholder: "Filter data",
@@ -358,9 +318,11 @@ export function BarGraph({ loadHelpPanelContent, symbol }) {
         height={300}
         loadingText="Loading chart"
         recoveryText="Retry"
-        statusType={loading}
+        statusType={loadings}
         xScaleType="categorical"
+        onRecoveryClick={fetchEarnings}
         yTitle="Revenue (USD)"
+        xTitle={xTitle}
         empty={
           <Box textAlign="center" color="inherit">
             <b>No data available</b>

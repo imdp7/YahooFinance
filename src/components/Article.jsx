@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import { polygon } from "../../api";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,28 +10,8 @@ import {
   Badge,
 } from "@cloudscape-design/components";
 
-function Article(props) {
+function Article({news}) {
   const navigate = useNavigate();
-  const [news, setNews] = useState([]);
-
-  const fetchNews = async () => {
-    try {
-
-      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${props.category}&limit=15&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`,
-      {
-        method : "GET",
-        mode: 'cors',
-    });
-      const data = res.data?.results;
-      setNews(data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchNews();
-  }, [props.category, polygon]);
 
   function truncate(str, n) {
     return str?.length > n ? str.substr(0, n - 1) + "..." : str;

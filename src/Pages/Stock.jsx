@@ -51,19 +51,96 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   const navigate = useNavigate();
   const customer = useSelector((state) => state.customer);
   const [profile, setProfile] = useState([]);
-  const [polygon, setPolygon] = useState([]);
+  const [polygons, setPolygons] = useState([]);
+  const [news, setNews] = useState([]);
   const [recommend, setRecommend] = useState([]);
   const [activeTabId, setActiveTabId] = useState("summary");
   const [loading, setLoading] = useState(false);
+   const [loadChart, setLoadingChart] = React.useState("finished");
+  const [earnings, setEarnings] = React.useState([]);
+  const [graphData, setGraphData] = React.useState([]);
+  const [range, setRange] = React.useState("1d"); // Track the selected range
+  const [interval, setInterval] = React.useState("15m");
 
+  const ear = {
+    method: 'GET',
+    url: 'https://yh-finance.p.rapidapi.com/stock/get-earnings',
+    params: {
+      symbol: symbol,
+      region: 'US',
+      lang: 'en-US'
+    },
+    headers: {
+      'X-RapidAPI-Key': key,
+      'X-RapidAPI-Host': 'yh-finance.p.rapidapi.com'
+    }
+  };
 
+  const chartData = {
+    method: 'GET',
+    url: 'https://yh-finance.p.rapidapi.com/stock/v3/get-chart',
+    params: {
+      interval: interval,
+      symbol: symbol,
+      range: range,
+      region: 'US',
+      includePrePost: 'false',
+      useYfid: 'true',
+      includeAdjustedClose: 'true',
+    },
+    headers: {
+      'X-RapidAPI-Key': key,
+      'X-RapidAPI-Host': 'yh-finance.p.rapidapi.com'
+    }
+  };
+
+  const fetchChart = async () => {
+    try {
+      setLoadingChart("loading");
+      const response = await axios.request(chartData);
+      const data = response?.data?.chart?.result[0];
+      setGraphData(data);
+      setLoadingChart("finished");
+    } catch (e) {
+      console.log(e);
+      setLoadingChart("error");
+    }
+  };
+
+  const fetchEarnings = async () => {
+    try {
+      setLoadingChart("loading");
+      const response = await axios.request(ear);
+      const data = response?.data?.quoteSummary?.result[0]?.earnings;
+      setEarnings(data);
+      setLoadingChart("finished");
+    } catch (e) {
+      console.log(e);
+      setLoadingChart("error");
+    }
+  };
   const fetchPolygon = async () => {
     try {
       const res = await axios.get(
-        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`, {mode:'cors'}
+        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=${polygon}`, {mode:'cors'}
       );
       const data = res.data.results;
-      setPolygon(data);
+      setPolygons(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchNews = async () => {
+    try {
+
+      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${symbol}&limit=15&apiKey=${polygon}`,
+      {
+        method : "GET",
+        mode: 'cors',
+    });
+      const data = res.data?.results;
+      setNews(data);
     } catch (error) {
       console.error(error);
     }
@@ -90,9 +167,13 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
 
   const handleRefresh = () => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 1000);
+    const timer = setTimeout(() => {
+      setLoading(false);
+      fetchData();
+    }, 1000);
     return () => clearTimeout(timer);
   };
+  
 
   const convertUnixTimestampToTime = (unixTimestamp) => {
     const dateObj = new Date(unixTimestamp * 1000);
@@ -217,46 +298,50 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   };
 
   useEffect(() => {
+    navigate(`?tabId=${activeTabId}`, { replace: true });
     const fetchData = async () => {
       try {
-        await Promise.all([fetchProfile(), fetchRecommend()]);
-
-        const savedSymbols =
-          JSON.parse(localStorage.getItem("wishlistSymbols")) || [];
-        const recentSymbols =
-          JSON.parse(localStorage.getItem("recentlyVisitedSymbols")) || [];
-
-        if (savedSymbols.length > 0) {
-          dispatch(setWishlistSymbols(savedSymbols));
-        } else {
-          const response = await fetch(
-            `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
-          );
-          const data = await response.json();
-          if (Array.isArray(data.wishlist.symbols)) {
-            dispatch(setWishlistSymbols(data.wishlist.symbols));
-          }
-        }
-        if (recentSymbols) {
-          dispatch(addToRecentlyVisited(recentSymbols));
-        } else {
-          const response = await fetch(
-            `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
-          );
-          const data = await response.json();
-          if (Array.isArray(data.recentlyVisited.symbols)) {
-            dispatch(setRecentlyVisitedSymbols(data.recentlyVisited.symbols));
-          }
-        }
+        await Promise.all([fetchProfile(), fetchRecommend(),fetchNews(),fetchPolygon(),
+          fetchEarnings(),
+          fetchChart()])
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-    fetchPolygon()
-    navigate(`?tabId=${activeTabId}`, { replace: true });
-    fetchData();
+  
+    const fetchWishlistSymbols = async () => {
+      const savedSymbols = JSON.parse(localStorage.getItem("wishlistSymbols")) || [];
+      if (savedSymbols.length > 0) {
+        dispatch(setWishlistSymbols(savedSymbols));
+      } else {
+        const response = await fetch(
+          `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
+        );
+        const data = await response.json();
+        if (Array.isArray(data.wishlist.symbols)) {
+          dispatch(setWishlistSymbols(data.wishlist.symbols));
+        }
+      }
+    };
+  
+    const fetchRecentlyVisitedSymbols = async () => {
+      const recentSymbols = JSON.parse(localStorage.getItem("recentlyVisitedSymbols")) || [];
+      if (recentSymbols.length > 0) {
+        dispatch(addToRecentlyVisited(recentSymbols));
+      } else {
+        const response = await fetch(
+          `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
+        );
+        const data = await response.json();
+        if (Array.isArray(data.recentlyVisited.symbols)) {
+          dispatch(setRecentlyVisitedSymbols(data.recentlyVisited.symbols));
+        }
+      }
+    };
     addRecentlyVisited(`${symbol}`);
-  }, [activeTabId, customer.sub, dispatch, navigate, symbol, polygon]);
+    fetchData();
+  }, [symbol]);
+  
 
   function getIcon(str) {
     if (str === "UP") {
@@ -320,9 +405,9 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
             actions={
               <SpaceBetween size="xl" direction="horizontal">
               <div>
-              {polygon?.branding?.logo_url && (
+              {polygons?.branding?.logo_url && (
                 <img
-                  src={`${polygon?.branding?.logo_url}?apiKey=${polygon}`}
+                  src={`${polygons?.branding?.logo_url}?apiKey=${polygon}`}
                   height="50"
                   width="100"
                 />
@@ -363,9 +448,9 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
             }>
             <SpaceBetween size="xl" direction="horizontal">
             <div>
-            {polygon?.branding?.icon_url && (
+            {polygons?.branding?.icon_url && (
               <img
-                src={`${polygon?.branding?.icon_url}?apiKey=${polygon}`}
+                src={`${polygons?.branding?.icon_url}?apiKey=${polygon}`}
                 height="50"
                 width="50"
               />
@@ -519,7 +604,17 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
                 symbol={symbol}
                 profile={profile}
                 recommend={recommend}
+                news={news}
                 loadHelpPanelContent={loadHelpPanelContent}
+                graphData={graphData}
+                earning={earnings}
+                loadings={loadChart}
+                fetchEarnings={fetchEarnings}
+                fetchChart={fetchChart}
+                setRange={setRange}
+                setInterval={setInterval}
+                range={range}
+                
               />
             ),
           },

@@ -188,8 +188,8 @@ const Data = (props) => {
     </SpaceBetween>
   );
 };
-const NewsSection = ({ symbol }) => {
-  return <Article category={symbol} />;
+const NewsSection = ({news}) => {
+  return <Article news={news} />;
 };
 function Summary(props) {
   return (
@@ -210,17 +210,14 @@ function Summary(props) {
       >
         <NewsSection
           {...props}
-          loadHelpPanelContent={props.loadHelpPanelContent}
         />
         <SpaceBetween size="m">
           <Table
             header="Recommended Stocks"
             data={props.recommend}
-            loadHelpPanelContent={props.loadHelpPanelContent}
           />
           <BarGraph
             {...props}
-            loadHelpPanelContent={props.loadHelpPanelContent}
           />
           {/* <BarGraph
             {...props}
@@ -228,15 +225,12 @@ function Summary(props) {
           /> */}
           <Outlook
             {...props}
-            loadHelpPanelContent={props.loadHelpPanelContent}
           />
           <UpgradeDowngrade
             {...props}
-            loadHelpPanelContent={props.loadHelpPanelContent}
           />
           <CompanyProfile
             {...props}
-            loadHelpPanelContent={props.loadHelpPanelContent}
           />
         </SpaceBetween>
       </Grid>

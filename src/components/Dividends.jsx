@@ -8,8 +8,9 @@ import {
   Button,
   SpaceBetween,
 } from "@cloudscape-design/components";
+import {polygon} from '../../api'
 function Dividends({symbol}) {
-  console.log(symbol)
+
   const [loading, setLoading] = React.useState(false);
   const [status, setStatus] = React.useState([]);
 
