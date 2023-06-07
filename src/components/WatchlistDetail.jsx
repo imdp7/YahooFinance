@@ -1,5 +1,5 @@
-import React from 'react';
-import TopNavigations from '../components/TopNavigation';
+import React from "react";
+import TopNavigations from "../components/TopNavigation";
 import {
   AppLayout,
   SpaceBetween,
@@ -15,24 +15,24 @@ import {
   Link,
   Tabs,
   Table,
-} from '@cloudscape-design/components';
-import { useLocation } from 'react-router-dom';
-import axios from 'axios';
-import { key, host } from '../../api';
-import { useNavigate } from 'react-router-dom';
-import { visibleWatchListColumns, watchListPreferences } from './common/Table';
-import Card from './common/Card';
+} from "@cloudscape-design/components";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { key, host } from "../../api";
+import { useNavigate } from "react-router-dom";
+import { visibleWatchListColumns, watchListPreferences } from "./common/Table";
+import Card from "./common/Card";
 const i18nStrings = {
-  overflowMenuTriggerText: 'More',
-  overflowMenuTitleText: 'All',
+  overflowMenuTriggerText: "More",
+  overflowMenuTitleText: "All",
 };
 
 const BASE_URL =
-  'https://yh-finance.p.rapidapi.com/market/get-watchlist-detail?';
+  "https://yh-finance.p.rapidapi.com/market/get-watchlist-detail?";
 const KEY_URL = `&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 const PERFORMANCE_URL =
-  'https://yh-finance.p.rapidapi.com/market/get-watchlist-performance?';
-const AUTOCOMPLETE_URL = 'https://yh-finance.p.rapidapi.com/auto-complete?';
+  "https://yh-finance.p.rapidapi.com/market/get-watchlist-performance?";
+const AUTOCOMPLETE_URL = "https://yh-finance.p.rapidapi.com/auto-complete?";
 function WatchlistDetail(props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -78,7 +78,7 @@ function WatchlistDetail(props) {
     fetchAutoComplete();
   }, [performance, complete, detail, location]);
   function truncate(str, n) {
-    return str?.length > n ? str.substr(0, n - 1) + '...' : str;
+    return str?.length > n ? str.substr(0, n - 1) + "..." : str;
   }
   const Content = ({ state, detail }) => {
     const quoteValues =
@@ -88,7 +88,7 @@ function WatchlistDetail(props) {
     //       ? Object.values(performance.portfolio).map((obj) => obj)
     //       : [];
     //     console.log(PerformanceArray);
-    performance['symbol'] = state.name;
+    performance["symbol"] = state.name;
     const performanceArray = [performance];
     const [preferences, setPreferences] = React.useState({
       wrapLines: true,
@@ -99,77 +99,115 @@ function WatchlistDetail(props) {
     const fixedDigit = (str) => str?.toFixed(2);
     return (
       <SpaceBetween size="m">
-        <div>
-          <div
-          //     style={{ backgroundImage: url(state?.originalImageURL) }}
-          >
-            <div>
-              <h1>Welcome to the site</h1>
-              <h5>Sign up for free today</h5>
-              <Button>Get started</Button>
-            </div>
-          </div>
-          <div dangerouslySetInnerHTML={{ __html: state?.description }} />
-        </div>
+  {/* <div
+    style={{
+      backgroundImage: `url(${state?.originalImageURL})`,
+      backgroundSize: "contain",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      width: "100%",
+      height: "350px", // Adjust the height according to your needs
+    }}
+  /> */}
+  <div>
+  <div
+    style={{
+      backgroundImage: `url(${state?.originalImageURL})`,
+      backgroundSize: "contain",
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      width: "100%",
+      paddingTop: "52.5%", // Aspect ratio of 4:3 (3/4 * 70% = 52.5%)
+      position: "relative",
+    }}
+  >
+    <div
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "contain",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <img
+          src={state?.originalImageURL}
+          alt="Image"
+          style={{ maxWidth: "100%", maxHeight: "100%" }}
+        />
+      </div>
+    </div>
+  </div>
+  <div dangerouslySetInnerHTML={{ __html: state?.description }} />
+</div>
         <Table
           items={performanceArray || []}
           header={<Header variant="h3">Performance</Header>}
           columnDefinitions={[
             {
-              id: 'watchlist',
-              header: 'Watchlist',
-              cell: (e) => e?.symbol || '-',
+              id: "watchlist",
+              header: "Watchlist",
+              cell: (e) => e?.symbol || "-",
             },
 
             {
-              id: 'oneDayPercentChange',
-              header: 'Change Today',
+              id: "oneDayPercentChange",
+              header: "Change Today",
               cell: (e) => (
                 <span
                   style={{
-                    color: e.oneDayPercentChange < 0 ? 'red' : 'green',
-                  }}
-                >
-                  {fixedDigit(e?.oneDayPercentChange) || '-'}
+                    color: e.oneDayPercentChange < 0 ? "red" : "green",
+                  }}>
+                  {fixedDigit(e?.oneDayPercentChange) || "-"}
                 </span>
               ),
             },
             {
-              id: 'oneMonthPercentChange',
-              header: '1 Month Return',
+              id: "oneMonthPercentChange",
+              header: "1 Month Return",
               cell: (e) => (
                 <span
                   style={{
-                    color: e.oneMonthPercentChange < 0 ? 'red' : 'green',
-                  }}
-                >
-                  {fixedDigit(e?.oneMonthPercentChange) || '-'}
+                    color: e.oneMonthPercentChange < 0 ? "red" : "green",
+                  }}>
+                  {fixedDigit(e?.oneMonthPercentChange) || "-"}
                 </span>
               ),
             },
             {
-              id: 'oneYearPercentChange',
-              header: '1 Year Return	',
+              id: "oneYearPercentChange",
+              header: "1 Year Return	",
               cell: (e) => (
                 <span
                   style={{
-                    color: e.oneYearPercentChange < 0 ? 'red' : 'green',
-                  }}
-                >
-                  {fixedDigit(e?.oneYearPercentChange) || '-'}
+                    color: e.oneYearPercentChange < 0 ? "red" : "green",
+                  }}>
+                  {fixedDigit(e?.oneYearPercentChange) || "-"}
                 </span>
               ),
             },
             {
-              id: 'lifetimePercentChange',
-              header: 'Total Return',
+              id: "lifetimePercentChange",
+              header: "Total Return",
               cell: (e) => (
                 <span
                   style={{
-                    color: e.lifetimePercentChange < 0 ? 'red' : 'green',
-                  }}
-                >
-                  {fixedDigit(e?.lifetimePercentChange) || '-'}
+                    color: e.lifetimePercentChange < 0 ? "red" : "green",
+                  }}>
+                  {fixedDigit(e?.lifetimePercentChange) || "-"}
                 </span>
               ),
             },
@@ -178,7 +216,7 @@ function WatchlistDetail(props) {
           empty={
             <Box textAlign="center" color="inherit">
               <b>No resources</b>
-              <Box padding={{ bottom: 's' }} variant="p" color="inherit">
+              <Box padding={{ bottom: "s" }} variant="p" color="inherit">
                 No resources to display.
               </Box>
             </Box>
@@ -199,15 +237,15 @@ function WatchlistDetail(props) {
           empty={
             <Box textAlign="center" color="inherit">
               <b>No resources</b>
-              <Box padding={{ bottom: 's' }} variant="p" color="inherit">
+              <Box padding={{ bottom: "s" }} variant="p" color="inherit">
                 No resources to display.
               </Box>
             </Box>
           }
           columnDefinitions={[
             {
-              id: 'symbol',
-              header: 'Symbol',
+              id: "symbol",
+              header: "Symbol",
               cell: (e) => (
                 <Link onFollow={() => navigate(`/stocks/${e.symbol}`)}>
                   {e.symbol}
@@ -215,199 +253,197 @@ function WatchlistDetail(props) {
               ),
             },
             {
-              id: 'name',
-              header: 'Company Name',
+              id: "name",
+              header: "Company Name",
               cell: (e) => e.longName,
             },
             {
-              id: 'price',
-              header: 'Last Price',
+              id: "price",
+              header: "Last Price",
               cell: (e) => e.regularMarketPrice,
             },
             {
-              id: 'change',
-              header: 'Change',
+              id: "change",
+              header: "Change",
               cell: (e) => (
                 <span
                   style={{
-                    color: e.regularMarketChange < 0 ? 'red' : 'green',
-                  }}
-                >
-                  {fixedDigit(e?.regularMarketChange) || '-'}
+                    color: e.regularMarketChange < 0 ? "red" : "green",
+                  }}>
+                  {fixedDigit(e?.regularMarketChange) || "-"}
                 </span>
               ),
             },
             {
-              id: 'changePer',
-              header: 'Change %',
+              id: "changePer",
+              header: "Change %",
               cell: (e) => (
                 <span
                   style={{
-                    color: e.regularMarketChangePercent < 0 ? 'red' : 'green',
-                  }}
-                >
-                  {fixedDigit(e?.regularMarketChangePercent) || '-'}
+                    color: e.regularMarketChangePercent < 0 ? "red" : "green",
+                  }}>
+                  {fixedDigit(e?.regularMarketChangePercent) || "-"}
                 </span>
               ),
             },
             {
-              id: 'marketTime',
-              header: 'Market Time',
+              id: "marketTime",
+              header: "Market Time",
               cell: (e) => e.regularMarketTime,
             },
             {
-              id: 'volume',
-              header: 'Volume',
+              id: "volume",
+              header: "Volume",
               cell: (e) => e.regularMarketVolume,
             },
             {
-              id: 'volume3Month',
-              header: 'Avg Vol (3 month)',
+              id: "volume3Month",
+              header: "Avg Vol (3 month)",
               cell: (e) => e.averageDailyVolume3Month,
             },
             {
-              id: 'marketCap',
-              header: 'Market cap',
+              id: "marketCap",
+              header: "Market cap",
               cell: (e) => e.marketCap,
             },
             {
-              id: 'region',
-              header: 'Region',
+              id: "region",
+              header: "Region",
               cell: (e) => e.region,
             },
             {
-              id: 'quoteType',
-              header: 'Quote Type',
+              id: "quoteType",
+              header: "Quote Type",
               cell: (e) => e.quoteType,
             },
             {
-              id: 'quoteSourceName',
-              header: 'Quote Source Name',
+              id: "quoteSourceName",
+              header: "Quote Source Name",
               cell: (e) => e.quoteSourceName,
             },
             {
-              id: 'priceHint',
-              header: 'Price Hint',
+              id: "priceHint",
+              header: "Price Hint",
               cell: (e) => e.priceHint,
             },
             {
-              id: 'bid',
-              header: 'Bid',
+              id: "bid",
+              header: "Bid",
               cell: (e) => e.bid,
             },
             {
-              id: 'ask',
-              header: 'ask',
+              id: "ask",
+              header: "ask",
               cell: (e) => e.ask,
             },
             {
-              id: 'bidSize',
-              header: 'Bid Size',
+              id: "bidSize",
+              header: "Bid Size",
               cell: (e) => e.bidSize,
             },
             {
-              id: 'askSize',
-              header: 'Ask Size',
+              id: "askSize",
+              header: "Ask Size",
               cell: (e) => e.askSize,
             },
             {
-              id: 'fullExchangeName',
-              header: 'Exchange Name',
+              id: "fullExchangeName",
+              header: "Exchange Name",
               cell: (e) => e.fullExchangeName,
             },
             {
-              id: 'averageDailyVolume10Day',
-              header: 'Average Daily Volume 10 Day',
+              id: "averageDailyVolume10Day",
+              header: "Average Daily Volume 10 Day",
               cell: (e) => e.averageDailyVolume10Day,
             },
             {
-              id: 'fiftyTwoWeekLowChange',
-              header: 'Fifty Two Week Low Change',
+              id: "fiftyTwoWeekLowChange",
+              header: "Fifty Two Week Low Change",
               cell: (e) => e.fiftyTwoWeekLowChange,
             },
             {
-              id: 'fiftyTwoWeekLowChangePercent',
-              header: 'Fifty Two Week Low Change Percent',
+              id: "fiftyTwoWeekLowChangePercent",
+              header: "Fifty Two Week Low Change Percent",
               cell: (e) => e.fiftyTwoWeekLowChangePercent,
             },
             {
-              id: 'fiftyTwoWeekRange',
-              header: 'Fifty Two Week Range',
+              id: "fiftyTwoWeekRange",
+              header: "Fifty Two Week Range",
               cell: (e) => e.fiftyTwoWeekRange,
             },
             {
-              id: 'fiftyTwoWeekHighChange',
-              header: 'Fifty Two Week High Change',
+              id: "fiftyTwoWeekHighChange",
+              header: "Fifty Two Week High Change",
               cell: (e) => e.fiftyTwoWeekHighChange,
             },
             {
-              id: 'fiftyTwoWeekHighChangePercent',
-              header: 'Fifty Two Week High Change Percent',
+              id: "fiftyTwoWeekHighChangePercent",
+              header: "Fifty Two Week High Change Percent",
               cell: (e) => e.fiftyTwoWeekHighChangePercent,
             },
             {
-              id: 'fiftyTwoWeekLow',
-              header: 'Fifty Two Week Low',
+              id: "fiftyTwoWeekLow",
+              header: "Fifty Two Week Low",
               cell: (e) => e.fiftyTwoWeekLow,
             },
             {
-              id: 'fiftyTwoWeekHigh',
-              header: 'Fifty Two Week High',
+              id: "fiftyTwoWeekHigh",
+              header: "Fifty Two Week High",
               cell: (e) => e.fiftyTwoWeekHigh,
             },
             {
-              id: 'dividendDate',
-              header: 'Dividend Date',
-              cell: (e) => e.dividendDate || '-',
+              id: "dividendDate",
+              header: "Dividend Date",
+              cell: (e) => e.dividendDate || "-",
             },
             {
-              id: 'trailingPE',
-              header: 'Trailing PE',
+              id: "trailingPE",
+              header: "Trailing PE",
               cell: (e) => e.trailingPE,
             },
             {
-              id: 'twoHundredDayAverageChangePercent',
-              header: 'Two Hundred Day Average Change Percent',
+              id: "twoHundredDayAverageChangePercent",
+              header: "Two Hundred Day Average Change Percent",
               cell: (e) => e.twoHundredDayAverageChangePercent,
             },
             {
-              id: 'forwardPE',
-              header: 'Forward PE',
+              id: "forwardPE",
+              header: "Forward PE",
               cell: (e) => e.forwardPE,
             },
             {
-              id: 'priceToBook',
-              header: 'Price To Book',
+              id: "priceToBook",
+              header: "Price To Book",
               cell: (e) => e.priceToBook,
             },
             {
-              id: 'exchangeTimezoneName',
-              header: 'Exchange Timezone Name',
+              id: "exchangeTimezoneName",
+              header: "Exchange Timezone Name",
               cell: (e) => e.exchangeTimezoneName,
             },
             {
-              id: 'fiftyDayAverage',
-              header: 'Fifty Day Average',
+              id: "fiftyDayAverage",
+              header: "Fifty Day Average",
               cell: (e) => e.fiftyDayAverage,
             },
             {
-              id: 'fiftyDayAverageChange',
-              header: 'Fifty Day Average Change',
+              id: "fiftyDayAverageChange",
+              header: "Fifty Day Average Change",
               cell: (e) => e.fiftyDayAverageChange,
             },
             {
-              id: 'fiftyDayAverageChangePercent',
-              header: 'Fifty Day Average Change Percent',
+              id: "fiftyDayAverageChangePercent",
+              header: "Fifty Day Average Change Percent",
               cell: (e) => e.fiftyDayAverageChangePercent,
             },
             {
-              id: 'twoHundredDayAverage',
-              header: 'Two Hundred Day Average',
+              id: "twoHundredDayAverage",
+              header: "Two Hundred Day Average",
               cell: (e) => e.twoHundredDayAverage,
             },
             {
-              id: 'twoHundredDayAverageChange',
-              header: 'Two Hundred Day Average Change',
+              id: "twoHundredDayAverageChange",
+              header: "Two Hundred Day Average Change",
               cell: (e) => e.twoHundredDayAverageChange,
             },
           ]}
@@ -419,46 +455,44 @@ function WatchlistDetail(props) {
               onConfirm={({ detail }) => setPreferences(detail)}
               preferences={preferences}
               wrapLinesPreference={{
-                label: 'Wrap lines',
-                description: 'Select to see all the text and wrap the lines',
+                label: "Wrap lines",
+                description: "Select to see all the text and wrap the lines",
               }}
               stripedRowsPreference={{
-                label: 'Striped rows',
-                description: 'Select to add alternating shaded rows',
+                label: "Striped rows",
+                description: "Select to add alternating shaded rows",
               }}
               contentDensityPreference={{
-                label: 'Compact mode',
+                label: "Compact mode",
                 description:
-                  'Select to display content in a denser, more compact mode',
+                  "Select to display content in a denser, more compact mode",
               }}
               contentDisplayPreference={{
-        title: "Column preferences",
-        description:
-          "Customize the columns visibility and order.",
-        liveAnnouncementDndStarted: (position, total) =>
-          `Picked up item at position ${position} of ${total}`,
-        liveAnnouncementDndDiscarded:
-          "Reordering canceled",
-        liveAnnouncementDndItemReordered: (
-          initialPosition,
-          currentPosition,
-          total
-        ) =>
-          initialPosition === currentPosition
-            ? `Moving item back to position ${currentPosition} of ${total}`
-            : `Moving item to position ${currentPosition} of ${total}`,
-        liveAnnouncementDndItemCommitted: (
-          initialPosition,
-          finalPosition,
-          total
-        ) =>
-          initialPosition === finalPosition
-            ? `Item moved back to its original position ${initialPosition} of ${total}`
-            : `Item moved from position ${initialPosition} to position ${finalPosition} of ${total}`,
-        dragHandleAriaDescription:
-          "Use Space or Enter to activate drag for an item, then use the arrow keys to move the item's position. To complete the position move, use Space or Enter, or to discard the move, use Escape.",
-        dragHandleAriaLabel: "Drag handle",
-        options: watchListPreferences,
+                title: "Column preferences",
+                description: "Customize the columns visibility and order.",
+                liveAnnouncementDndStarted: (position, total) =>
+                  `Picked up item at position ${position} of ${total}`,
+                liveAnnouncementDndDiscarded: "Reordering canceled",
+                liveAnnouncementDndItemReordered: (
+                  initialPosition,
+                  currentPosition,
+                  total
+                ) =>
+                  initialPosition === currentPosition
+                    ? `Moving item back to position ${currentPosition} of ${total}`
+                    : `Moving item to position ${currentPosition} of ${total}`,
+                liveAnnouncementDndItemCommitted: (
+                  initialPosition,
+                  finalPosition,
+                  total
+                ) =>
+                  initialPosition === finalPosition
+                    ? `Item moved back to its original position ${initialPosition} of ${total}`
+                    : `Item moved from position ${initialPosition} to position ${finalPosition} of ${total}`,
+                dragHandleAriaDescription:
+                  "Use Space or Enter to activate drag for an item, then use the arrow keys to move the item's position. To complete the position move, use Space or Enter, or to discard the move, use Escape.",
+                dragHandleAriaLabel: "Drag handle",
+                options: watchListPreferences,
               }}
             />
           }
@@ -474,8 +508,7 @@ function WatchlistDetail(props) {
                       <Link
                         href={n.link}
                         external
-                        externalIconAriaLabel="external"
-                      >
+                        externalIconAriaLabel="external">
                         <Box fontSize="heading-m" fontWeight="bold">
                           {n?.title}
                         </Box>
@@ -485,12 +518,11 @@ function WatchlistDetail(props) {
                       gridDefinition={[
                         { colspan: 9, push: { s: 3 } },
                         { colspan: 3, pull: { s: 9 } },
-                      ]}
-                    >
+                      ]}>
                       <Box>{truncate(n.summary, 400)}</Box>
                       <img
                         src={n?.main_image?.original_url}
-                        style={{ maxWidth: '100%' }}
+                        style={{ maxWidth: "100%" }}
                         alt={n?.reference_id}
                         className="article-image"
                       />
@@ -519,9 +551,9 @@ function WatchlistDetail(props) {
   };
   return (
     <>
-      <div id="h" style={{ position: 'sticky', top: 0, zIndex: 1002 }}>
+      <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
         <TopNavigations
-          identity={{ href: '#' }}
+          identity={{ href: "#" }}
           i18nStrings={i18nStrings}
           {...props}
         />
@@ -534,8 +566,8 @@ function WatchlistDetail(props) {
         breadcrumbs={
           <BreadcrumbGroup
             items={[
-              { text: 'Explore', href: '/' },
-              { text: `${location.state.state.name}`, href: '#' },
+              { text: "Explore", href: "/" },
+              { text: `${location.state.state.name}`, href: "#" },
             ]}
             ariaLabel="Breadcrumbs"
           />
@@ -547,12 +579,10 @@ function WatchlistDetail(props) {
                 header={
                   <Header
                     variant="h2"
-                    description={location.state.state.shortDescription}
-                  >
+                    description={location.state.state.shortDescription}>
                     {location.state.state.name}
                   </Header>
-                }
-              >
+                }>
                 <Content detail={detail} state={location.state.state} />
               </Container>
             </ContentLayout>

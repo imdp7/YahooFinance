@@ -60,7 +60,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   const fetchPolygon = async () => {
     try {
       const res = await axios.get(
-        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=${polygon}`
+        `https://api.polygon.io/v3/reference/tickers/${symbol}?apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`, {mode:'cors'}
       );
       const data = res.data.results;
       setPolygon(data);

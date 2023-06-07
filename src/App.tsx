@@ -24,13 +24,6 @@ import { addCustomer } from "./app/actions";
 I18n.putVocabularies(translations);
 I18n.setLanguage("en");
 
-// Add default headers for CORS
-axios.defaults.headers.common["Access-Control-Allow-Origin"] = "*";
-axios.defaults.headers.common["Access-Control-Allow-Methods"] =
-  "GET, POST, PUT, DELETE";
-axios.defaults.headers.common["Access-Control-Allow-Headers"] =
-  "Content-Type, Authorization";
-
 Amplify.configure(awsExports);
 
 const App = ({ user, signOut }) => {
@@ -87,7 +80,7 @@ const App = ({ user, signOut }) => {
 
     fetchUserAttributes();
   }, [dispatch]);
-  
+
   return (
     <Router>
       <Routes>

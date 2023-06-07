@@ -17,16 +17,12 @@ function Article(props) {
 
   const fetchNews = async () => {
     try {
-      const options = {
-        method: "GET",
-        url: `https://api.polygon.io/v2/reference/news?ticker=${props.category}&limit=15&apiKey=${polygon}`,
-        headers: {
-          "Access-Control-Allow-Origin": "*", // Allow requests from any origin
-          // 'Access-Control-Allow-Methods': 'GET', // Allow only GET requests
-        },
-      };
 
-      const res = await axios.request(options);
+      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${props.category}&limit=15&apiKey=tNspjXd0liysppgjJpI0ELqEjWWT6MoE`,
+      {
+        method : "GET",
+        mode: 'cors',
+    });
       const data = res.data?.results;
       setNews(data);
     } catch (error) {

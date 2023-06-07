@@ -189,7 +189,7 @@ const Data = (props) => {
   );
 };
 const NewsSection = ({ symbol }) => {
-  return <Article category={`${symbol}`} />;
+  return <Article category={symbol} />;
 };
 function Summary(props) {
   return (
