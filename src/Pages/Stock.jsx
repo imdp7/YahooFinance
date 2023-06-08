@@ -327,30 +327,30 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
         const data = await response.json();
   
         if (Array.isArray(data.wishlist?.symbols)) {
-          dispatch(setWishlistSymbols(data.wishlist.symbols));
+          dispatch(setWishlistSymbols(data?.wishlist?.symbols));
         }
       }
     };
   
-    // const fetchRecentlyVisitedSymbols = async () => {
-    //   const recentSymbols = JSON.parse(localStorage.getItem("recentlyVisitedSymbols")) || [];
+    const fetchRecentlyVisitedSymbols = async () => {
+      const recentSymbols = JSON.parse(localStorage.getItem("recentlyVisitedSymbols")) || [];
   
-    //   if (recentSymbols.length > 0) {
-    //     dispatch(addToRecentlyVisited(recentSymbols));
-    //   } else {
-    //     const response = await fetch(
-    //       `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
-    //     );
-    //     const data = await response.json();
+      if (recentSymbols.length > 0) {
+        dispatch(addToRecentlyVisited(recentSymbols));
+      } else {
+        const response = await fetch(
+          `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
+        );
+        const data = await response.json();
   
-    //     if (Array.isArray(data.recentlyVisited?.symbols)) {
-    //       dispatch(setRecentlyVisitedSymbols(data.recentlyVisited.symbols));
-    //     }
-    //   }
-    // };
+        if (Array.isArray(data.recentlyVisited?.symbols)) {
+          dispatch(setRecentlyVisitedSymbols(data?.recentlyVisited?.symbols));
+        }
+      }
+    };
   
     addRecentlyVisited(`${symbol}`);
-    // fetchRecentlyVisitedSymbols();
+    fetchRecentlyVisitedSymbols();
     fetchWishlistSymbols();
     fetchData();
   }, [symbol]);
