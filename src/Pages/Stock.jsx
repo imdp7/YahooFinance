@@ -349,7 +349,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
       }
     };
   
-    addRecentlyVisited(`${symbol}`);
+    // addRecentlyVisited(symbol);
     fetchRecentlyVisitedSymbols();
     fetchWishlistSymbols();
     fetchData();
