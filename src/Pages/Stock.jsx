@@ -299,11 +299,17 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
 
   useEffect(() => {
     navigate(`?tabId=${activeTabId}`, { replace: true });
+  
     const fetchData = async () => {
       try {
-        await Promise.all([fetchProfile(), fetchRecommend(),fetchNews(),fetchPolygon(),
+        await Promise.all([
+          fetchProfile(),
+          fetchRecommend(),
+          fetchNews(),
+          fetchPolygon(),
           fetchEarnings(),
-          fetchChart()])
+          fetchChart(),
+        ]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -311,6 +317,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   
     const fetchWishlistSymbols = async () => {
       const savedSymbols = JSON.parse(localStorage.getItem("wishlistSymbols")) || [];
+  
       if (savedSymbols.length > 0) {
         dispatch(setWishlistSymbols(savedSymbols));
       } else {
@@ -318,31 +325,36 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
           `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
         );
         const data = await response.json();
-        if (Array.isArray(data.wishlist.symbols)) {
+  
+        if (Array.isArray(data.wishlist?.symbols)) {
           dispatch(setWishlistSymbols(data.wishlist.symbols));
         }
       }
     };
   
-    const fetchRecentlyVisitedSymbols = async () => {
-      const recentSymbols = JSON.parse(localStorage.getItem("recentlyVisitedSymbols")) || [];
-      if (recentSymbols.length > 0) {
-        dispatch(addToRecentlyVisited(recentSymbols));
-      } else {
-        const response = await fetch(
-          `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
-        );
-        const data = await response.json();
-        if (Array.isArray(data.recentlyVisited.symbols)) {
-          dispatch(setRecentlyVisitedSymbols(data.recentlyVisited.symbols));
-        }
-      }
-    };
+    // const fetchRecentlyVisitedSymbols = async () => {
+    //   const recentSymbols = JSON.parse(localStorage.getItem("recentlyVisitedSymbols")) || [];
+  
+    //   if (recentSymbols.length > 0) {
+    //     dispatch(addToRecentlyVisited(recentSymbols));
+    //   } else {
+    //     const response = await fetch(
+    //       `https://rich-blue-chimpanzee-hose.cyclic.app/api/customers/${customer.sub}`
+    //     );
+    //     const data = await response.json();
+  
+    //     if (Array.isArray(data.recentlyVisited?.symbols)) {
+    //       dispatch(setRecentlyVisitedSymbols(data.recentlyVisited.symbols));
+    //     }
+    //   }
+    // };
+  
     addRecentlyVisited(`${symbol}`);
-    fetchRecentlyVisitedSymbols();
+    // fetchRecentlyVisitedSymbols();
     fetchWishlistSymbols();
     fetchData();
   }, [symbol]);
+  
   
 
   function getIcon(str) {
@@ -596,7 +608,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
       <Tabs
         onChange={({ detail }) => setActiveTabId(detail.activeTabId)}
         activeTabId={activeTabId}
-        variant="container"
+        variant="stacked"
         tabs={[
           {
             label: "Summary",
@@ -761,7 +773,9 @@ function Stock(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      topRef.current.scrollIntoView({ behavior: "smooth" });
+      if (topRef.current !== null) {
+        topRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     }, 500);
   }, [symbol]);
 
@@ -788,15 +802,15 @@ function Stock(props) {
         />
       </div>
       <AppLayout
-        ref={topRef}
         headerSelector="#h"
         contentType="dashboard"
         toolsOpen={toolsOpen}
         tools={toolsContent}
         navigationHide={true}
         onToolsChange={({ detail }) => setToolsOpen(detail.open)}
-        notifications={<Flashbar       items={loadings ? [{ type: "success", content: "Pending Operation...", loading: {loadings}, }] : items} />}
+        notifications={<Flashbar items={loadings ? [{ type: "success", content: "Pending Operation...", loading: {loadings}, }] : items} />}
         content={
+          <div ref={topRef}>
           <ContentLayout header={<Header variant="h3" />}>
             <Content
               symbol={symbol}
@@ -808,6 +822,7 @@ function Stock(props) {
               loadings={loadings}
             />
           </ContentLayout>
+            </div>
         }
       />
       {modalState.visible && (

@@ -1,17 +1,20 @@
-import React from 'react';
+import React from "react";
 import {
   ColumnLayout,
   SpaceBetween,
   Box,
   Grid,
-} from '@cloudscape-design/components';
-import { Graph, BarGraph } from './Graph';
-import Article from './Article';
-import Movers from './Movers';
-import Table from './Table';
-import UpgradeDowngrade from './UpgradeDowngrade';
-import CompanyProfile from './CompanyProfile';
-import Outlook from './Outlook';
+  Header,
+  CollectionPreferences,
+} from "@cloudscape-design/components";
+import {summaryContentDisplay, summaryVisibleContent} from './common/Preference.js'
+import { Graph, BarGraph } from "./Graph";
+import Article from "./Article";
+import Movers from "./Movers";
+import Table from "./Table";
+import UpgradeDowngrade from "./UpgradeDowngrade";
+import CompanyProfile from "./CompanyProfile";
+import Outlook from "./Outlook";
 
 const Data = (props) => {
   const {
@@ -20,175 +23,65 @@ const Data = (props) => {
     profile = props.profile,
   } = props;
 
+  const [preferences, setPreferences] = React.useState({
+    visibleContentPreference: {
+      options: summaryVisibleContent
+    },
+    contentDisplayPreference: {
+      options: summaryContentDisplay 
+    },
+  });
+  
+  const getOptionData = (optionId) => {
+    // Your logic to retrieve option data
+    return (summary && summary[optionId]?.fmt) || '-';
+  }
+
   return (
     <SpaceBetween size="s">
+      <Header
+        variant="h3"
+        actions={
+          <CollectionPreferences
+          onConfirm={(updatedPreferences) => setPreferences({ ...preferences, ...updatedPreferences })}
+            cancelLabel="Cancel"
+            confirmLabel="Apply"
+            title="Preferences"
+            preferences={preferences}
+            visibleContentPreference={preferences.visibleContentPreference}
+            contentDisplayPreference={preferences.contentDisplayPreference}
+          />
+        }>
+        Key Statistics
+      </Header>
       <ColumnLayout columns={2} variant="text-grid">
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Previous Close
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.regularMarketPreviousClose?.fmt
-              ? summary?.regularMarketPreviousClose?.fmt
-              : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Market Cap
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.marketCap?.fmt ? summary?.marketCap?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Open
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.regularMarketOpen?.fmt
-              ? summary?.regularMarketOpen?.fmt
-              : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Beta (5Y Monthly)
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.beta?.fmt ? summary?.beta?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Bid
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.bid?.fmt ? (
-              <>
-                {summary?.bid?.fmt} {'x'} {summary?.bidSize?.raw}{' '}
-              </>
-            ) : (
-              '-'
-            )}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            PE Ratio (TTM)
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.payoutRatio?.fmt ? summary?.payoutRatio?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Ask
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.ask?.fmt ? (
-              <>
-                {summary?.ask?.fmt} x {summary?.askSize?.raw}
-              </>
-            ) : (
-              '-'
-            )}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            EPS (TTM)
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {profile?.defaultKeyStatistics?.trailingEps?.fmt
-              ? profile?.defaultKeyStatistics?.trailingEps?.fmt
-              : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Day's Range
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.dayLow?.fmt ? (
-              <>
-                {summary?.dayLow?.fmt} - {summary?.dayHigh?.fmt}
-              </>
-            ) : (
-              '-'
-            )}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Earnings Date
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {earnings?.earningsDate?.fmt ? earnings?.earningsDate?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            52 Week Range
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.fiftyTwoWeekLow?.fmt ? (
-              <>
-                {summary?.fiftyTwoWeekLow?.fmt} -{' '}
-                {summary?.fiftyTwoWeekHigh?.fmt}
-              </>
-            ) : (
-              '-'
-            )}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Forward Dividend & Yield
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.dividendYield?.fmt ? summary?.dividendYield?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Volume
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.volume?.longFmt ? summary?.volume?.longFmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Ex Dividend Date
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.exDividendDate?.fmt ? summary?.exDividendDate?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            Avg. Volume
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {summary?.averageVolume?.fmt ? summary?.averageVolume?.fmt : '-'}
-          </Box>
-        </span>
-        <span>
-          <Box float="left" color="text-body-secondary">
-            1y Target Est
-          </Box>
-          <Box float="right" fontWeight="bold">
-            {profile?.financialData?.targetMeanPrice?.fmt
-              ? profile?.financialData?.targetMeanPrice?.fmt
-              : '-'}
-          </Box>
-        </span>
+        {preferences.visibleContentPreference.options.map((group) => (
+          <React.Fragment key={group.label}>
+            {group.options.map((option) => (
+              <span key={option.id}>
+                {preferences.contentDisplayPreference.options.some(
+                  (displayOption) => displayOption.id === option.id
+                ) && (
+                  <React.Fragment>
+                    <Box float="left" color="text-body-secondary" fontWeight="bold">
+                      {option.label}
+                    </Box>
+                    <Box float="right" fontWeight="bold">
+                      {/* Render relevant data based on option.id */}
+                      {getOptionData(option.id)}
+                    </Box>
+                  </React.Fragment>
+                )}
+              </span>
+            ))}
+          </React.Fragment>
+        ))}
+        
       </ColumnLayout>
     </SpaceBetween>
   );
 };
-const NewsSection = ({news}) => {
+const NewsSection = ({ news }) => {
   return <Article news={news} />;
 };
 function Summary(props) {
@@ -206,32 +99,14 @@ function Summary(props) {
           { colspan: { l: 4, m: 4, default: 12 } },
           { colspan: { l: 4, m: 4, default: 12 } },
           { colspan: { l: 4, m: 4, default: 12 } },
-        ]}
-      >
-        <NewsSection
-          {...props}
-        />
+        ]}>
+        <NewsSection {...props} />
         <SpaceBetween size="m">
-          <Table
-            header="Recommended Stocks"
-            data={props.recommend}
-          />
-          <BarGraph
-            {...props}
-          />
-          {/* <BarGraph
-            {...props}
-            loadHelpPanelContent={props.loadHelpPanelContent}
-          /> */}
-          <Outlook
-            {...props}
-          />
-          <UpgradeDowngrade
-            {...props}
-          />
-          <CompanyProfile
-            {...props}
-          />
+          <Table header="Recommended Stocks" data={props.recommend} />
+          <BarGraph {...props} />
+          <Outlook {...props} />
+          <UpgradeDowngrade {...props} />
+          <CompanyProfile {...props} />
         </SpaceBetween>
       </Grid>
     </SpaceBetween>
