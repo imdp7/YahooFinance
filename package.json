@@ -64,5 +64,5 @@
     "vite": "^4.2.1",
     "vitest": "^0.29.8"
   },
-  "proxy":"https://api.polygon.io"
+  "proxy": "https://api.polygon.io"
 }

@@ -14,6 +14,7 @@ import { historicalDefinition } from "./common/Table";
 import Dividends from "./Dividends";
 import Split from "./Split";
 import * as XLSX from "xlsx";
+import Events from './Events';
 
 const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 
@@ -21,6 +22,7 @@ function Historical(props) {
   const [historical, setHistorical] = React.useState([]);
   const [value, setValue] = React.useState(undefined);
   const [selectedOption, setSelectedOption] = React.useState("historical");
+  const [active, setActive] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
   const fetchHistorical = async () => {
@@ -41,30 +43,59 @@ function Historical(props) {
   }, [props.symbol]);
 
   const downloadExcel = () => {
-    const sheetName = "Historical Data";
-    const headers = [
-      "Date",
-      "Open",
-      "High",
-      "Low",
-      "Close",
-      "Adj Close",
-      "Volume",
-    ];
-    const data = historical?.prices?.map((item) => [
-      convertUnixTimestamp(item.date),
-      decimal(item.open),
-      decimal(item.high),
-      decimal(item.low),
-      decimal(item.close),
-      decimal(item.adjclose),
-      item.volume,
-    ]);
-    const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-    XLSX.writeFile(workbook, `${sheetName}.xlsx`);
-  };
+    const sheetName =
+    selectedOption === "historical"
+      ? "Historical Data"
+      : selectedOption === "dividend"
+      ? "Dividends"
+      : selectedOption === "split"
+      ? "Stock Splits"
+      : selectedOption === "capitalGain"
+      ? "Capital Gain"
+      : selectedOption === "events"
+      ? "Stock Events"
+      : "Data";
+      let headers = [];
+      let data = [];
+    
+      if (selectedOption === "historical") {
+        headers = [
+          "Date",
+          "Open",
+          "High",
+          "Low",
+          "Close",
+          "Adj Close",
+          "Volume",
+        ];
+        data = historical?.prices?.map((item) => [
+          convertUnixTimestamp(item.date),
+          decimal(item.open),
+          decimal(item.high),
+          decimal(item.low),
+          decimal(item.close),
+          decimal(item.adjclose),
+          item.volume,
+        ]);
+      } else if (selectedOption === "dividend") {
+        headers = ["Declaration Date", "ex-Dividend Date", "Frequency", "Pay Date", "Record Date", "Cash Amount", "Dividend Type"];
+        data = [] // Logic to extract dividend data based on your implementation
+      } else if (selectedOption === "split") {
+        headers = ["Execution Date", "Split From", "Split To"];
+        data = [] // Logic to extract stock splits data based on your implementation
+      } else if (selectedOption === "capitalGain") {
+        headers = ["Date", "Capital Gain"];
+        data = [] // Logic to extract capital gain data based on your implementation
+      } else if (selectedOption === "events") {
+        headers = ["Ticker Change", "Type", "Date"];
+        data = [] // Logic to extract stock events data based on your implementation
+      }
+    
+      const worksheet = XLSX.utils.aoa_to_sheet([headers, ...data]);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+      XLSX.writeFile(workbook, `${sheetName}.xlsx`);
+    };
 
   const TimeRange = () => {
     return (
@@ -179,14 +210,17 @@ function Historical(props) {
       <SpaceBetween size="m" direction="horizontal">
         <TimeRange />
         <ButtonDropdown
+        variant="primary"
           onItemClick={(evt) => {
             evt.preventDefault();
             setSelectedOption(evt.detail.id);
+            setActive(true);
           }}
           items={[
             { text: "Historical Prices", id: "historical", disabled: false },
             { text: "Dividends only", id: "dividend", disabled: false },
             { text: "Stock splits", id: "split", disabled: false },
+            { text: "Stock Events", id: "events", disabled: false },
             { text: "Capital gain", id: "capitalGain", disabled: false },
           ]}>
           {selectedOption === "historical"
@@ -197,7 +231,9 @@ function Historical(props) {
             ? "Stock splits"
             : selectedOption === "capitalGain"
             ? "Capital gain"
-            : ""}
+            : selectedOption === "events"
+            ? "Stock Events" : ""}
+            
         </ButtonDropdown>
       </SpaceBetween>
       <Box>
@@ -234,6 +270,7 @@ function Historical(props) {
       )}
       {selectedOption === "dividend" && <Dividends symbol={props.symbol} />}
       {selectedOption === "split" && <Split symbol={props.symbol} />}
+      {selectedOption === "events" && <Events symbol={props.symbol} />}
     </SpaceBetween>
   );
 }

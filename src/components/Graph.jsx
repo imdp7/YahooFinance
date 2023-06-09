@@ -283,8 +283,8 @@ const xTitle = selectedId === 'annually' ? "Annually" : 'Quarterly';
             valueFormatter: (e) => "$" + e.toLocaleString("en-US"),
           },
         ]}
-        xDomain={xDomain || []}
-        yDomain={[lowestValue, highestValue] || []}
+        xDomain={xDomain}
+        yDomain={[lowestValue, highestValue]}
         i18nStrings={{
           filterLabel: "Filter displayed data",
           filterPlaceholder: "Filter data",

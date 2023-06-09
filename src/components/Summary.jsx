@@ -81,8 +81,8 @@ const Data = (props) => {
     </SpaceBetween>
   );
 };
-const NewsSection = ({ news }) => {
-  return <Article news={news} />;
+const NewsSection = (props) => {
+  return <Article {...props} />;
 };
 function Summary(props) {
   return (

@@ -53,6 +53,8 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   const [profile, setProfile] = useState([]);
   const [polygons, setPolygons] = useState([]);
   const [news, setNews] = useState([]);
+  const [nextUrl, setNextUrl] = useState(null);
+  const observer = useRef();
   const [recommend, setRecommend] = useState([]);
   const [activeTabId, setActiveTabId] = useState("summary");
   const [loading, setLoading] = useState(false);
@@ -61,6 +63,8 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   const [graphData, setGraphData] = React.useState([]);
   const [range, setRange] = React.useState("1d"); // Track the selected range
   const [interval, setInterval] = React.useState("15m");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const ear = {
     method: 'GET',
@@ -131,18 +135,24 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
     }
   };
 
-  const fetchNews = async () => {
+  const fetchNews = async (url) => {
     try {
-
-      const res = await axios.request(`https://api.polygon.io/v2/reference/news?ticker=${symbol}&limit=15&apiKey=${polygon}`,
-      {
-        method : "GET",
-        mode: 'cors',
-    });
+      setIsLoading(true);
+      const res = await axios.get(url);
       const data = res.data?.results;
-      setNews(data);
+      setNews((prevNews) => [...prevNews, ...data]);
+      setNextUrl(res.data?.next_url);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleObserver = (entries) => {
+    const target = entries[0];
+    if (target.isIntersecting && nextUrl && !isLoading) {
+      fetchNews(nextUrl);
     }
   };
   const fetchProfile = async () => {
@@ -298,14 +308,24 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
   };
 
   useEffect(() => {
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(handleObserver, { threshold: 1 });
+    if (nextUrl && !isLoading) observer.current.observe(document.querySelector('.observer-element'));
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [nextUrl]);
+
+  useEffect(() => {
     navigate(`?tabId=${activeTabId}`, { replace: true });
-  
+    const initialUrl = `https://api.polygon.io/v2/reference/news?ticker=${symbol}&apiKey=${polygon}`;
     const fetchData = async () => {
       try {
         await Promise.all([
           fetchProfile(),
           fetchRecommend(),
-          fetchNews(),
+          fetchNews(initialUrl),
           fetchPolygon(),
           fetchEarnings(),
           fetchChart(),
@@ -348,12 +368,12 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
         }
       }
     };
-  
+    document.title = `${profile?.price?.shortName} (${symbol})`
     // addRecentlyVisited(symbol);
     fetchRecentlyVisitedSymbols();
     fetchWishlistSymbols();
     fetchData();
-  }, [symbol]);
+  }, [symbol, loading, profile?.price?.shortName]);
   
   
 
@@ -628,6 +648,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
                 setRange={setRange}
                 setInterval={setInterval}
                 range={range}
+                isLoading={isLoading}
                 
               />
             ),

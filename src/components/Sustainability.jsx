@@ -17,12 +17,15 @@ const BASE_URL = 'https://yh-finance.p.rapidapi.com/stock/get-esg-scores?';
 const KEY_URL = `&region=US&lang=en-US&rapidapi-key=${key}&x-rapidapi-host=${host}`;
 function Sustainability({ symbol, profile, loadHelpPanelContent }) {
   const [sustain, setSustain] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
 
   const fetchSustain = async () => {
     try {
+      setLoading(true)
       const response = await axios.get(`${BASE_URL}symbol=${symbol}${KEY_URL}`);
       const sus = response?.data?.quoteSummary?.result[0]?.esgScores;
       setSustain(sus);
+      setLoading(false)
     } catch (e) {
       console.log(e);
     }
@@ -43,11 +46,13 @@ function Sustainability({ symbol, profile, loadHelpPanelContent }) {
   };
   return (
     <SpaceBetween size="m">
+    {!loading && (
+      <>
       <Container
         header={
           <Header
             variant="h3"
-            description="Sustainalytics’ ESG Risk Ratings assess the degree to which a company’s enterprise business value is at risk driven by environmental, social and governance issues. The rating employs a two-dimensional framework that combines an assessment of a company’s exposure to industry-specific material ESG issues with an assessment of how well the company is managing those issues. The final ESG Risk Ratings scores are a measure of unmanaged risk on an absolute scale of 0-100, with a lower score signaling less unmanaged ESG Risk."
+            description="Sustain analytic's ESG Risk Ratings assess the degree to which a company’s enterprise business value is at risk driven by environmental, social and governance issues. The rating employs a two-dimensional framework that combines an assessment of a company’s exposure to industry-specific material ESG issues with an assessment of how well the company is managing those issues. The final ESG Risk Ratings scores are a measure of unmanaged risk on an absolute scale of 0-100, with a lower score signaling less unmanaged ESG Risk."
             info={
               <InfoLink
                 onFollow={() =>
@@ -65,6 +70,7 @@ function Sustainability({ symbol, profile, loadHelpPanelContent }) {
           </Header>
         }
       >
+      
         <ColumnLayout columns={4} variant="text-grid">
           <FormField
             label="Total ESG Risk score"
@@ -260,7 +266,7 @@ function Sustainability({ symbol, profile, loadHelpPanelContent }) {
           >
             <SpaceBetween size="s">
               {sustain?.relatedControversy?.map((rel, idx) => (
-                <Box fontSize="heading-m" key={idx}>
+                <Box fontSize="body-m" key={idx}>
                   {rel}
                 </Box>
               ))}
@@ -325,6 +331,8 @@ function Sustainability({ symbol, profile, loadHelpPanelContent }) {
           </ColumnLayout>
         </Container>
       </Grid>
+      </>
+      )}
     </SpaceBetween>
   );
 }

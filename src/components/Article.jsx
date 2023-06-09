@@ -8,10 +8,22 @@ import {
   Grid,
   Link,
   Badge,
+  Spinner,
+  Flashbar
 } from "@cloudscape-design/components";
 
-function Article({news}) {
+function Article({news, isLoading}) {
   const navigate = useNavigate();
+  const [items, setItems] = React.useState([
+    {
+      type: "warning",
+      content: "No more news articles.",
+      dismissible: true,
+      dismissLabel: "Dismiss message",
+      onDismiss: () => setItems([]),
+      id: "message_1"
+    }
+  ]);
 
   function truncate(str, n) {
     return str?.length > n ? str.substr(0, n - 1) + "..." : str;
@@ -62,6 +74,9 @@ function Article({news}) {
           </SpaceBetween>
         </Container>
       ))}
+      {isLoading && <Spinner size="large" className="spinner" />}
+      {!news.nextUrl && !isLoading && <Flashbar items={items} />}
+      <div className="observer-element" style={{ height: '10px' }} />
     </SpaceBetween>
   );
 }
