@@ -23,7 +23,7 @@ import {
   colorChartsStatusPositive,
 } from "@cloudscape-design/design-tokens";
 import { useNavigate } from "react-router-dom";
-import { convertUnixTimestamp } from "./Historical";
+import { convertUnixTimestamp } from "./common/Table";
 import { InfoLink, HelpPanels } from "../components/common/InfoLink";
 
 const KEY_URL = `&region=US&rapidapi-key=${key}&x-rapidapi-host=${host}`;

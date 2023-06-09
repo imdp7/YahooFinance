@@ -602,7 +602,7 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
             )}
           </div>
         </div>
-        <Button onClick={() => handleModalOpen(Dividends, "Dividends History", symbol)}>Dividends</Button>
+        
         </SpaceBetween>
       </Container>
       <Tabs
@@ -793,7 +793,7 @@ function Stock(props) {
   };
 
   return (
-    <>
+    <div ref={topRef}>
       <div id="h" style={{ position: "sticky", top: 0, zIndex: 1002 }}>
         <TopNavigations
           identity={{ href: "#" }}
@@ -810,7 +810,7 @@ function Stock(props) {
         onToolsChange={({ detail }) => setToolsOpen(detail.open)}
         notifications={<Flashbar items={loadings ? [{ type: "success", content: "Pending Operation...", loading: {loadings}, }] : items} />}
         content={
-          <div ref={topRef}>
+          
           <ContentLayout header={<Header variant="h3" />}>
             <Content
               symbol={symbol}
@@ -822,7 +822,6 @@ function Stock(props) {
               loadings={loadings}
             />
           </ContentLayout>
-            </div>
         }
       />
       {modalState.visible && (
@@ -834,7 +833,7 @@ function Stock(props) {
                 symbol={modalState.symbol}
               />
             )}
-    </>
+    </div>
   );
 }
 

@@ -18,7 +18,7 @@ import {
   Table,
   FormField,
 } from '@cloudscape-design/components';
-import { convertUnixTimestamp } from '../components/Historical';
+import { convertUnixTimestamp } from '../components/common/Table';
 const i18nStrings = {
   overflowMenuTriggerText: 'More',
   overflowMenuTitleText: 'All',

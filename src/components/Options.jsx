@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { key, host , polygon} from "../../api";
 
-import { convertUnixTimestamp } from "./Historical";
+import { convertUnixTimestamp } from "./common/Table";
 import {
   Container,
   SpaceBetween,

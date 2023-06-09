@@ -858,3 +858,72 @@ export const cashFlowPreferences = [
     label: "Capital Expenditures",
   },
 ];
+
+
+export function convertUnixTimestamp(unixTimestamp) {
+  const dateObj = new Date(unixTimestamp * 1000);
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const year = dateObj.getFullYear();
+  const month = months[dateObj.getMonth()];
+  const date = dateObj.getDate().toString().padStart(2, "0");
+  const dayOfWeek = daysOfWeek[dateObj.getDay()];
+  const hours = dateObj.getHours().toString().padStart(2, "0");
+  const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+  return `${dayOfWeek}, ${month} ${date}, ${year} at ${hours}:${minutes} EST`;
+}
+
+function decimal(number) {
+  return number?.toFixed(2);
+}
+export const historicalDefinition = [
+  {
+    id: "date",
+    header: "Date",
+    cell: (item) => convertUnixTimestamp(item?.date) || "-",
+    sortingField: "name",
+  },
+  {
+    id: "open",
+    header: "Open",
+    cell: (item) => decimal(item?.open) || "-",
+  },
+  {
+    id: "high",
+    header: "High",
+    cell: (item) => decimal(item?.high) || "-",
+  },
+  {
+    id: "low",
+    header: "Low",
+    cell: (item) => decimal(item?.low) || "-",
+  },
+  {
+    id: "close",
+    header: "Close*",
+    cell: (item) => decimal(item?.close) || "-",
+  },
+  {
+    id: "adjClose",
+    header: "AdjClose**",
+    cell: (item) => decimal(item?.adjclose) || "-",
+  },
+  {
+    id: "volume",
+    header: "Volume",
+    cell: (item) => item?.volume || "-",
+  },
+];
