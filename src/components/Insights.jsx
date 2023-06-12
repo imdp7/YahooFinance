@@ -33,16 +33,16 @@ function Insights(props) {
   const [loading, setLoading] = React.useState("finished");
   const fetchInsights = async () => {
     try {
-      setLoading('loading')
+      setLoading("loading");
       const response = await axios.get(
         `https://yh-finance.p.rapidapi.com/stock/v3/get-insights?symbol=${props.symbol}${KEY_URL}`
       );
       const datas = response?.data?.finance?.result;
       setInsights(datas);
-      setLoading('finished')
+      setLoading("finished");
     } catch (e) {
       console.log(e);
-      setLoading('error')
+      setLoading("error");
     }
   };
   React.useEffect(() => {
@@ -119,8 +119,8 @@ function Insights(props) {
             },
           ]}
           detailPopoverContent={(datum, sum) => [
-        { key: "Perceentage", value: datum.value },
-      ]}
+            { key: "Percentage", value: datum.value },
+          ]}
           i18nStrings={{
             detailsValue: "Value",
             detailsPercentage: "Percentage",
@@ -326,6 +326,48 @@ function Insights(props) {
                       {insights?.recommendation?.rating || "N/A"}
                     </FormField>
                   </ColumnLayout>
+                  <Header
+                    variant="h3"
+                    info={
+                      <InfoLink
+                        onFollow={() =>
+                          props.loadHelpPanelContent(
+                            <HelpPanels
+                              title="Events"
+                              des="View the Stock profile data of Summary, Insights, Chart, Statistics, Historical data, Profile, Financials, Analysis, Options, Holders, Sustainability."
+                            />
+                          )
+                        }
+                      />
+                    }>
+                    Events
+                  </Header>
+                  {insights?.events && insights?.events?.map((event, idx) => (
+                    <div key={idx}>
+                    <img src={event?.imageUrl} alt="img" />
+                    <ColumnLayout columns={4} borders="all" variant="text-grid">
+                    <FormField label="Event Type">
+                      {event?.eventType || "N/A"}
+                    </FormField>
+                    <FormField label="Price Period">
+                      {event?.pricePeriod || "N/A"}
+                    </FormField>
+                    <FormField label="Trading Horizon">
+                      {event?.tradingHorizon || "N/A"}
+                    </FormField>
+                    <FormField label="Trade Type">
+                      {event?.tradeType || "N/A"}
+                    </FormField>
+                    <FormField label="Start Date">
+                      {convertUnixTimestamp(event?.startDate) || "N/A"}
+                    </FormField>
+                    <FormField label="End Date">
+                      {convertUnixTimestamp(event?.endDate) || "N/A"}
+                    </FormField>
+                  </ColumnLayout>
+                    </div>
+                  ))}
+                  
                 </SpaceBetween>
               </Container>
             )}
@@ -403,25 +445,29 @@ function Insights(props) {
                     defaultExpanded>
                     <SpaceBetween size="s">
                       <Container
+                        header={
+                          <Header
+                            variant="h3"
+                            description={
+                              insights?.upsellSearchDD?.researchReports
+                                ?.reportDate
+                            }
+                            actions={
+                              <Box float="right">
+                                {
+                                  insights?.upsellSearchDD?.researchReports
+                                    ?.provider
+                                }
+                              </Box>
+                            }>
+                            {insights?.upsellSearchDD?.researchReports?.title}
+                          </Header>
+                        }
                         footer={getActionString(
                           insights?.upsellSearchDD?.researchReports
                             ?.investmentRating
                         )}>
                         <SpaceBetween size="xs">
-                          <Box>
-                            <Box
-                              fontSize="heading-m"
-                              fontWeight="bold"
-                              float="left">
-                              {insights?.upsellSearchDD?.researchReports?.title}
-                            </Box>
-                            <Box float="right">
-                              {
-                                insights?.upsellSearchDD?.researchReports
-                                  ?.provider
-                              }
-                            </Box>
-                          </Box>
                           <Box>
                             {insights?.upsellSearchDD?.researchReports?.summary}
                           </Box>
@@ -431,10 +477,7 @@ function Insights(props) {
                   </ExpandableSection>
                 )}
                 {insights?.reports && (
-                  <ExpandableSection
-                    variant="container"
-                    headerText="Reports"
-                    defaultExpanded>
+                  <ExpandableSection variant="container" headerText="Reports">
                     <SpaceBetween size="s">
                       {insights?.reports?.map((report) => (
                         <Container key={report?.id}>
@@ -857,7 +900,7 @@ function Insights(props) {
                 </Container>
               </SpaceBetween>
             )}
-            {activeHref === "page7" && (
+            {activeHref === "page6" && (
               <SpaceBetween size="s">
                 {insights?.sigDevs && (
                   <Container
@@ -869,27 +912,93 @@ function Insights(props) {
                             onFollow={() =>
                               props.loadHelpPanelContent(
                                 <HelpPanels
-                                  title="Hiring Trends"
+                                  title="Innovation"
                                   des="View the Stock profile data of Summary, Insights, Chart, Statistics, Historical data, Profile, Financials, Analysis, Options, Holders, Sustainability."
                                 />
                               )
                             }
                           />
                         }>
-                        Hiring Trends
+                        Innovation
                       </Header>
                     }>
                     <SpaceBetween size="m">
-                      {insights?.sigDevs?.map((hiring, idx) => (
+                      {insights?.sigDevs?.map((inno, idx) => (
                         <div key={idx}>
                           <Container
                             header={
-                              <Header variant="h4">{hiring?.date}</Header>
+                              <Header variant="h4">{inno?.date}</Header>
                             }>
-                            {hiring?.headline}
+                            {inno?.headline}
                           </Container>
                         </div>
                       ))}
+                    </SpaceBetween>
+                  </Container>
+                )}
+              </SpaceBetween>
+            )}
+            {activeHref === "page8" && (
+              <SpaceBetween size="s">
+                {insights?.upsell && (
+                  <Container
+                    header={
+                      <Header
+                        variant="h3"
+                        actions={
+                          <Box>{insights?.upsell?.upsellReportType}</Box>
+                        }
+                        description={
+                          <Box>
+                            {`Publish Date - ${convertUnixTimestamp(insights?.upsell?.msBullishBearishSummariesPublishDate)}`}
+                          </Box>
+                          }
+                        info={
+                          <InfoLink
+                            onFollow={() =>
+                              props.loadHelpPanelContent(
+                                <HelpPanels
+                                  title="Insider Sentiment"
+                                  des="View the Stock profile data of Summary, Insights, Chart, Statistics, Historical data, Profile, Financials, Analysis, Options, Holders, Sustainability."
+                                />
+                              )
+                            }
+                          />
+                        }>
+                        Insider Sentiment
+                      </Header>
+                    }>
+                    <SpaceBetween size="m">
+                      <ExpandableSection
+                        defaultExpanded
+                        headerText="Bullish Sentiment">
+                        <ul>
+                          {insights?.upsell?.msBullishSummary?.map(
+                            (bull, idx) => (
+                              <SpaceBetween size="m" key={idx}>
+                                <li>
+                                  <Box fontSize="body-m">{bull}</Box>
+                                </li>
+                              </SpaceBetween>
+                            )
+                          )}
+                        </ul>
+                      </ExpandableSection>
+                      <ExpandableSection
+                        defaultExpanded
+                        headerText="Bearish Sentiment">
+                        <ul>
+                          {insights?.upsell?.msBearishSummary?.map(
+                            (bear, idx) => (
+                              <SpaceBetween size="m" key={idx}>
+                                <li>
+                                  <Box fontSize="body-m">{bear}</Box>
+                                </li>
+                              </SpaceBetween>
+                            )
+                          )}
+                        </ul>
+                      </ExpandableSection>
                     </SpaceBetween>
                   </Container>
                 )}

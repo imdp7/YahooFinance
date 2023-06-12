@@ -21,10 +21,9 @@ import {
   setRecentlyVisitedSymbols,
   addToRecentlyVisited,
 } from "../app/actions";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { key, host, polygon } from "../../api";
 import axios from "axios";
-import { InfoLink, HelpPanels } from "../components/common/InfoLink";
 import Summary from "../components/Summary";
 import Financials from "../components/Financials";
 import Profile from "../components/Profile";
@@ -35,8 +34,8 @@ import Insights from "../components/Insights";
 import Options from "../components/Options";
 import Statistics from "../components/Statistics";
 import Sustainability from "../components/Sustainability";
-import Dividends from '../components/Dividends';
 import Modals from '../components/common/Modals'
+import RecentUpdates from '../components/RecentUpdates';
 const i18nStrings = {
   overflowMenuTriggerText: "More",
   overflowMenuTitleText: "All",
@@ -374,39 +373,6 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
     fetchWishlistSymbols();
     fetchData();
   }, [symbol, loading, profile?.price?.shortName]);
-  
-  
-
-  function getIcon(str) {
-    if (str === "UP") {
-      return (
-        <Box textAlign="center">
-          <Icon name="caret-up-filled" size="medium" variant="success" />
-          <Box>{str}</Box>
-        </Box>
-      );
-    } else if (str === "DOWN") {
-      return (
-        <Box textAlign="center">
-          <Icon name="caret-down-filled" size="medium" variant="error" />
-          <Box>{str}</Box>
-        </Box>
-      );
-    } else if (str === "NEUTRAL") {
-      return (
-        <Box textAlign="center">
-          <Icon name="status-pending" size="medium" variant="subtle" />
-          <Box>{str}</Box>
-        </Box>
-      );
-    } else {
-      return (
-        <Box textAlign="center">
-          <Box>{str}</Box>
-        </Box>
-      );
-    }
-  }
 
   return (
     <SpaceBetween size="m">
@@ -606,21 +572,6 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
               </SpaceBetween>
             )}
           </SpaceBetween>
-          <div>
-        {profile?.pageViews && (
-            <SpaceBetween size="xl" direction="horizontal">
-              <FormField label="Short Term">
-                <Box>{getIcon(profile?.pageViews?.shortTermTrend)}</Box>
-              </FormField>
-              <FormField label="Mid Term">
-                <Box>{getIcon(profile?.pageViews?.midTermTrend)}</Box>
-              </FormField>
-              <FormField label="Long Term">
-                <Box>{getIcon(profile?.pageViews?.longTermTrend)}</Box>
-              </FormField>
-            </SpaceBetween>
-            )}
-          </div>
         </div>
         
         </SpaceBetween>
@@ -670,9 +621,17 @@ const Content = ({ symbol, loadHelpPanelContent, handleModalOpen, onItemsChange,
             content: "Third tab content area",
           },
           {
-            label: "Conversation",
-            id: "conversation",
-            content: "Third tab content area",
+            label: "Recent Updates",
+            id: "recent-updates",
+            content: (
+              <RecentUpdates
+                profile={profile}
+                symbol={symbol}
+                loadHelpPanelContent={loadHelpPanelContent}
+                loading={loading}
+                setLoading={setLoading}
+              />
+            ),
           },
           {
             label: "Statistics",

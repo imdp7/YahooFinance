@@ -157,7 +157,7 @@ export function Graph({graphData, loadings, fetchChart, setInterval, setRange, r
         }}
         ariaLabel="Single data series line chart"
         detailPopoverSize="small"
-        height={250}
+        height={350}
         hideFilter
         hideLegend
         onRecoveryClick={() => fetchChart()}

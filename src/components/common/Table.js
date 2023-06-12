@@ -927,3 +927,32 @@ export const historicalDefinition = [
     cell: (item) => item?.volume || "-",
   },
 ];
+
+export const upgdngDefinitions = [
+  {
+    id: "epochGradeDate",
+    header: "Date",
+    cell: (item) => convertUnixTimestamp(item.epochGradeDate) || "-",
+    isRowHeader: true,
+  },
+  {
+    id: "firm",
+    header: "Firm",
+    cell: (item) => item.firm || "-",
+  },
+  {
+    id: "toGrade",
+    header: "To Grade",
+    cell: (item) => item.toGrade || "-",
+  },
+  {
+    id: "fromGrade",
+    header: "From Grade",
+    cell: (item) => item.fromGrade || "-",
+  },
+  {
+    id: "action",
+    header: "Action",
+    cell: (item) => item.action || "-",
+  },
+];

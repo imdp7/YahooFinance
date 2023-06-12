@@ -217,6 +217,7 @@ function TopNavigations(props: State): JSX.Element {
               loadingText="Loading"
               errorText="Error fetching results."
               recoveryText="Retry"
+              // onRecoveryClick={() => fetchData()}
             />
           }
         />
