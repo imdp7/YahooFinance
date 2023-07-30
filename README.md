@@ -6,7 +6,7 @@
 
 - Authentication - AWS Cognito (AWS pool)
 - UI Library - AWS Design (Cloudscape v3)
-- Backend - GraphQL
+- Backend - Node.js MongoDB
 - Redux Store
 - UseCollection Hooks
 - Payments and billing through Stripe.js API - Validation of cards and banks
